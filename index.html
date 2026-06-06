@@ -1140,7 +1140,6 @@ function closeConfirm() {
    EXAM ENGINE
 ═══════════════════════════════════ */
 function beginExam() {
-  closeConfirm();
   DB = loadDB();
   currentExam = DB.exams.find(e => e.id === pendingId);
   qIdx = 0; answers = {}; timedOut = false;
@@ -1152,6 +1151,8 @@ function beginExam() {
   renderQ();
   startTimer(currentExam.time * 60);
   show('s-exam');
+  
+  closeConfirm();
 }
 
 function renderQ() {
