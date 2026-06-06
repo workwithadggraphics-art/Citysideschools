@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT Student Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --g:  #059669;
+    --g2: #047857;
+    --g3: #064e3b;
+    --gl: #d1fae5;
+    --gx: #a7f3d0;
+    --glow: rgba(5,150,105,0.15);
+    --ow: #f9f6ef;
+    --ow2: #f0ead8;
+    --cream: #fdfaf3;
+    --ink: #1c2b22;
+    --mid: #3d5a4a;
+    --soft: #7a9a86;
+    --border: rgba(5,150,105,0.18);
+    --card-shadow: 0 4px 24px rgba(4,120,87,0.1);
+    --lift: 0 16px 48px rgba(4,120,87,0.18);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Outfit', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* ════════════════════════════════
+     LOGIN
+  ════════════════════════════════ */
+  #s-login {
+    position: relative;
+    align-items: stretch;
+    overflow: hidden;
+  }
+
+  /* Left decorative panel */
+  .login-hero {
+    flex: 1.3;
+    position: relative;
+    background: var(--g3);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end;
+    padding: 0 0 64px;
+    overflow: hidden;
+  }
+
+  .hero-school-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.22;
+  }
+
+  .hero-gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(175deg, rgba(6,78,59,0.55) 0%, rgba(6,78,59,0.97) 70%);
+  }
+
+  .hero-content { position: relative; z-index: 2; text-align: center; padding: 0 40px; }
+
+  .hero-school-logo {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  .hero-school-logo img { width: 100%; height: 100%; object-fit: cover; }
+  .hero-logo-placeholder { font-size: 2.5rem; }
+
+  .hero-school-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.9rem;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .hero-school-location {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .hero-divider {
+    width: 48px; height: 2px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
+    margin: 0 auto 24px;
+  }
+
+  .hero-tagline {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.7;
+    max-width: 280px;
+  }
+
+  /* Decorative floating orbs */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.12);
+  }
+  .orb-1 { width: 280px; height: 280px; top: -60px; right: -80px; }
+  .orb-2 { width: 180px; height: 180px; top: 160px; left: -50px; }
+  .orb-3 { width: 120px; height: 120px; bottom: 200px; right: 30px; }
+
+  /* Right login panel */
+  .login-panel {
+    width: 420px;
+    background: var(--ow);
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 56px 44px;
+    position: relative;
+  }
+
+  .login-panel::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 10%; bottom: 10%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--border), transparent);
+  }
+
+  .panel-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--gl);
+    border: 1px solid var(--gx);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--g2);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 20px;
+  }
+
+  .panel-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.1rem;
+    color: var(--ink);
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  .panel-sub {
+    font-size: 0.88rem;
+    color: var(--soft);
+    margin-bottom: 36px;
+    line-height: 1.6;
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--mid);
+    margin-bottom: 7px;
+  }
+
+  .field-wrap {
+    position: relative;
+  }
+
+  .field-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: var(--soft);
+    pointer-events: none;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 13px 14px 13px 42px;
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    background: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .field input:focus {
+    border-color: var(--g);
+    box-shadow: 0 0 0 3px var(--glow);
+  }
+
+  .field input::placeholder { color: #b8cdc4; }
+
+  .error-box {
+    display: none;
+    background: #fef2f2;
+    border: 1.5px solid #fca5a5;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: #991b1b;
+    margin-bottom: 18px;
+  }
+
+  .btn-login {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--g) 0%, var(--g3) 100%);
+    border: none; border-radius: 11px;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 6px 20px var(--glow);
+    margin-top: 4px;
+  }
+
+  .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(5,150,105,0.28); }
+  .btn-login:active { transform: scale(0.98); }
+
+  .login-footer {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--soft);
+  }
+
+  .login-footer a {
+    color: var(--g2);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* ════════════════════════════════
+     DASHBOARD
+  ════════════════════════════════ */
+  #s-dashboard { flex-direction: column; background: var(--cream); }
+
+  .topbar {
+    height: 66px;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 0 36px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 80;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+  }
+
+  .tb-brand { display: flex; align-items: center; gap: 12px; }
+
+  .tb-logo {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 2px solid var(--g);
+    background: var(--gl);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; overflow: hidden;
+  }
+
+  .tb-logo img { width: 100%; height: 100%; object-fit: cover; }
+
+  .tb-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem; color: var(--g3);
+    font-weight: 600;
+  }
+
+  .tb-right { display: flex; align-items: center; gap: 16px; }
+
+  .student-chip {
+    display: flex; align-items: center; gap: 9px;
+    background: var(--ow);
+    border: 1.5px solid var(--border);
+    border-radius: 40px;
+    padding: 5px 14px 5px 6px;
+  }
+
+  .chip-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--g), var(--g3));
+    color: #fff; font-weight: 700; font-size: 0.82rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .chip-text .cn { font-size: 0.85rem; font-weight: 600; color: var(--ink); }
+  .chip-text .cc { font-size: 0.72rem; color: var(--soft); }
+
+  .btn-out {
+    padding: 7px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--mid);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.82rem; font-weight: 500;
+    cursor: pointer; transition: all 0.18s;
+  }
+
+  .btn-out:hover { border-color: var(--g); color: var(--g2); }
+
+  .dash-body {
+    max-width: 1080px; margin: 0 auto;
+    width: 100%; padding: 48px 36px;
+  }
+
+  .dash-welcome {
+    margin-bottom: 44px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+  }
+
+  .dash-welcome h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem; color: var(--ink); line-height: 1.15;
+  }
+
+  .dash-welcome p { font-size: 0.9rem; color: var(--soft); margin-top: 6px; }
+
+  .dash-date {
+    font-size: 0.82rem; color: var(--soft);
+    background: var(--ow);
+    border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 20px;
+  }
+
+  .subjects-heading {
+    font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--soft); margin-bottom: 20px;
+  }
+
+  .subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+  }
+
+  .subject-card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 26px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative; overflow: hidden;
+  }
+
+  .subject-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(to right, var(--g), var(--g2));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s;
+    border-radius: 0 0 18px 18px;
+  }
+
+  .subject-card:hover { transform: translateY(-5px); box-shadow: var(--lift); border-color: var(--g); }
+  .subject-card:hover::after { transform: scaleX(1); }
+
+  .sc-icon {
+    width: 52px; height: 52px;
+    background: var(--gl);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    margin-bottom: 18px;
+  }
+
+  .sc-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem; color: var(--ink);
+    margin-bottom: 5px;
+  }
+
+  .sc-meta { font-size: 0.8rem; color: var(--soft); }
+
+  .sc-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 14px;
+    background: var(--gl); color: var(--g2);
+    font-size: 0.75rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+  }
+
+  .sc-pill::before { content: '●'; font-size: 0.5rem; animation: blink 1.4s infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+  .empty-state {
+    grid-column: 1/-1;
+    text-align: center; padding: 80px 20px;
+    color: var(--soft);
+  }
+  .empty-state .ei { font-size: 3.5rem; margin-bottom: 12px; opacity: 0.5; }
+  .empty-state p { font-size: 0.95rem; }
+
+  /* ════════════════════════════════
+     MODAL
+  ════════════════════════════════ */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(6,28,18,0.6);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.22s;
+  }
+
+  .overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: #fff;
+    border-radius: 24px;
+    padding: 44px 40px;
+    max-width: 460px; width: 92%;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.22);
+    transform: translateY(16px) scale(0.96);
+    transition: all 0.25s;
+    text-align: center;
+  }
+
+  .overlay.open .modal { transform: translateY(0) scale(1); }
+
+  .modal-emoji { font-size: 3.2rem; margin-bottom: 14px; }
+
+  .modal h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem; color: var(--ink); margin-bottom: 8px;
+  }
+
+  .modal > p { font-size: 0.9rem; color: var(--soft); line-height: 1.6; margin-bottom: 0; }
+
+  .modal-meta-box {
+    background: var(--ow);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 20px 0;
+    text-align: left;
+  }
+
+  .meta-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 5px 0;
+    font-size: 0.88rem;
+    border-bottom: 1px solid var(--ow2);
+  }
+  .meta-row:last-child { border-bottom: none; }
+  .meta-row span:first-child { color: var(--soft); }
+  .meta-row span:last-child { font-weight: 600; color: var(--g2); }
+
+  .instructions-box {
+    background: #fffbeb;
+    border: 1.5px solid #fde68a;
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-size: 0.83rem;
+    color: #78350f;
+    text-align: left;
+    line-height: 1.65;
+    margin-bottom: 24px;
+  }
+
+  .modal-actions { display: flex; gap: 12px; }
+
+  .btn-cancel {
+    flex: 1; padding: 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    background: transparent; color: var(--mid);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.92rem; font-weight: 600;
+    cursor: pointer; transition: all 0.18s;
+  }
+
+  .btn-cancel:hover { border-color: #f87171; color: #dc2626; }
+
+  .btn-start {
+    flex: 1; padding: 13px;
+    background: linear-gradient(135deg, var(--g), var(--g3));
+    border: none; border-radius: 11px;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.92rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 5px 16px var(--glow);
+  }
+
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(5,150,105,0.3); }
+
+  /* ════════════════════════════════
+     EXAM SCREEN
+  ════════════════════════════════ */
+  #s-exam { flex-direction: column; background: var(--ow); }
+
+  .exam-bar {
+    background: linear-gradient(135deg, var(--g3) 0%, #022c22 100%);
+    height: 62px;
+    padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 80;
+  }
+
+  .exam-bar-left { display: flex; align-items: center; gap: 14px; }
+
+  .exam-subject-tag {
+    background: rgba(255,255,255,0.13);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 5px 14px;
+    font-size: 0.88rem; font-weight: 600;
+    color: #fff;
+  }
+
+  .exam-candidate-tag {
+    font-size: 0.82rem; color: rgba(255,255,255,0.65);
+  }
+
+  .timer-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 7px 20px;
+  }
+
+  .timer-label { font-size: 0.72rem; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.07em; }
+
+  #timer {
+    font-size: 1.6rem; font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  #timer.warn { color: #fbbf24; }
+  #timer.crit { color: #f87171; animation: tcrit 0.5s infinite; }
+  @keyframes tcrit { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+  .exam-main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 272px;
+    gap: 22px;
+    padding: 28px 28px 28px;
+    max-width: 1100px;
+    margin: 0 auto; width: 100%;
+  }
+
+  .q-panel {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    box-shadow: var(--card-shadow);
+  }
+
+  .q-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 22px;
+  }
+
+  .q-counter {
+    font-size: 0.8rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--soft);
+  }
+
+  .q-progress-track {
+    flex: 1; height: 5px;
+    background: var(--ow2);
+    border-radius: 3px;
+    margin: 0 14px; overflow: hidden;
+  }
+
+  .q-progress-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--g), var(--g2));
+    border-radius: 3px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .q-num-badge {
+    background: var(--gl); color: var(--g2);
+    font-size: 0.78rem; font-weight: 700;
+    padding: 3px 12px; border-radius: 20px;
+  }
+
+  .q-text {
+    font-size: 1.1rem; line-height: 1.75;
+    color: var(--ink);
+    padding-bottom: 26px;
+    border-bottom: 1.5px solid var(--ow2);
+    margin-bottom: 28px;
+  }
+
+  .options {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 11px;
+    margin-bottom: 32px;
+  }
+
+  .opt {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 15px 18px;
+    border: 2px solid var(--border);
+    border-radius: 13px;
+    background: #fff;
+    cursor: pointer; text-align: left;
+    transition: all 0.18s;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .opt:hover { border-color: var(--g); background: var(--gl); }
+
+  .opt.picked {
+    border-color: var(--g2);
+    background: var(--gl);
+    box-shadow: 0 0 0 3px var(--glow);
+  }
+
+  .opt-key {
+    min-width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--ow2);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.82rem;
+    color: var(--mid);
+    transition: all 0.18s; flex-shrink: 0;
+  }
+
+  .opt.picked .opt-key { background: var(--g2); color: #fff; }
+
+  .opt-text { font-size: 0.93rem; color: var(--ink); line-height: 1.5; padding-top: 2px; }
+
+  .q-footer {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .btn-qnav {
+    padding: 10px 22px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: #fff; color: var(--mid);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; transition: all 0.18s;
+  }
+
+  .btn-qnav:hover { border-color: var(--g); color: var(--g2); }
+
+  .btn-submit-exam {
+    padding: 10px 24px;
+    background: linear-gradient(135deg, var(--g), var(--g3));
+    border: none; border-radius: 10px;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 14px var(--glow);
+  }
+
+  .btn-submit-exam:hover { transform: translateY(-1px); box-shadow: 0 7px 20px rgba(5,150,105,0.3); }
+
+  /* Side navigator */
+  .nav-panel {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 24px 20px;
+    box-shadow: var(--card-shadow);
+    align-self: start;
+    position: sticky; top: 82px;
+  }
+
+  .nav-panel-title {
+    font-size: 0.73rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--soft); margin-bottom: 16px;
+  }
+
+  .q-grid {
+    display: grid; grid-template-columns: repeat(5,1fr);
+    gap: 6px; margin-bottom: 18px;
+  }
+
+  .qg-btn {
+    aspect-ratio: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--soft);
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .qg-btn.done { background: var(--gl); border-color: var(--g); color: var(--g2); }
+  .qg-btn.now { background: var(--g2); border-color: var(--g2); color: #fff; }
+
+  .legend { display: flex; flex-direction: column; gap: 7px; }
+
+  .leg-row { display: flex; align-items: center; gap: 8px; font-size: 0.77rem; color: var(--soft); }
+
+  .leg-dot {
+    width: 13px; height: 13px; border-radius: 4px; flex-shrink: 0;
+  }
+  .leg-dot.now { background: var(--g2); }
+  .leg-dot.done { background: var(--gl); border: 1.5px solid var(--g); }
+  .leg-dot.blank { background: #fff; border: 1.5px solid var(--border); }
+
+  /* ════════════════════════════════
+     RESULT
+  ════════════════════════════════ */
+  #s-result {
+    align-items: center; justify-content: center;
+    background: var(--ow);
+    padding: 40px 20px;
+    flex-direction: column;
+  }
+
+  .result-wrap {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 28px;
+    padding: 56px 48px;
+    max-width: 500px; width: 100%;
+    text-align: center;
+    box-shadow: var(--lift);
+    animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .result-emoji { font-size: 4rem; margin-bottom: 14px; }
+
+  .result-wrap h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.1rem; color: var(--ink); margin-bottom: 6px;
+  }
+
+  .result-wrap .rs { font-size: 0.9rem; color: var(--soft); margin-bottom: 32px; }
+
+  .timeout-note {
+    background: #fff7ed; border: 1.5px solid #fed7aa;
+    border-radius: 10px; padding: 11px 16px;
+    font-size: 0.85rem; color: #9a3412;
+    margin-bottom: 24px; display: none;
+  }
+
+  .score-donut {
+    position: relative; width: 150px; height: 150px;
+    margin: 0 auto 32px;
+  }
+
+  .donut-bg {
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    background: conic-gradient(var(--g) var(--pct, 0%), var(--ow2) 0%);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .donut-inner {
+    width: 106px; height: 106px;
+    background: #fff; border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+
+  .donut-pct {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem; font-weight: 700; color: var(--g2); line-height: 1;
+  }
+
+  .donut-lbl { font-size: 0.72rem; color: var(--soft); }
+
+  .result-stats {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 12px; margin-bottom: 32px;
+  }
+
+  .rs-item {
+    background: var(--ow); border-radius: 12px;
+    padding: 16px 8px;
+  }
+
+  .rs-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.9rem; font-weight: 700; color: var(--ink);
+  }
+
+  .rs-lbl { font-size: 0.73rem; color: var(--soft); margin-top: 2px; }
+
+  .btn-home {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--g), var(--g3));
+    border: none; border-radius: 12px;
+    color: #fff; font-family: 'Outfit', sans-serif;
+    font-size: 0.98rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 5px 18px var(--glow);
+  }
+
+  .btn-home:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,0.28); }
+
+  /* RESPONSIVE */
+  @media (max-width: 860px) {
+    #s-login { flex-direction: column; }
+    .login-hero { flex: 0 0 260px; }
+    .login-panel { width: 100%; }
+    .exam-main { grid-template-columns: 1fr; }
+    .nav-panel { position: static; }
+    .options { grid-template-columns: 1fr; }
+    .dash-welcome { flex-direction: column; align-items: flex-start; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════ SCREEN: LOGIN ═══════ -->
+<div class="screen active" id="s-login">
+  <div class="login-hero">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <!-- ↓ Replace with your school image path -->
+    <img class="hero-school-img" src="school-image.jpg" alt="School" onerror="this.style.display='none'">
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <!-- ↓ Replace with your school logo path -->
+      <div class="hero-school-logo">
+        <img src="school-logo.png" alt="Logo" onerror="this.outerHTML='<span class=hero-logo-placeholder>🏫</span>'">
+      </div>
+      <!-- ↓ Change to your school name -->
+      <div class="hero-school-name" id="hero-name">Cityside Secondary School</div>
+      <div class="hero-school-location">Sagamu, Ogun State · Nigeria</div>
+      <div class="hero-divider"></div>
+      <p class="hero-tagline">Computer-Based Testing Portal — Sit your exams with confidence.</p>
+    </div>
+  </div>
+
+  <div class="login-panel">
+    <div class="panel-badge">🎓 Student Access</div>
+    <div class="panel-title">Sign In to<br>Your Exam</div>
+    <p class="panel-sub">Enter the credentials provided to you by your school.</p>
+
+    <div class="error-box" id="login-err">Incorrect username or password. Try again.</div>
+
+    <div class="field">
+      <label>Username (Your Surname)</label>
+      <div class="field-wrap">
+        <span class="field-icon">👤</span>
+        <input type="text" id="f-user" placeholder="Enter your surname" autocomplete="off">
+      </div>
+    </div>
+    <div class="field">
+      <label>Password (Admission Number)</label>
+      <div class="field-wrap">
+        <span class="field-icon">🔒</span>
+        <input type="password" id="f-pass" placeholder="Enter your admission number">
+      </div>
+    </div>
+
+    <button class="btn-login" onclick="doLogin()">Sign In →</button>
+
+    <div class="login-footer">
+      Are you an admin? <a href="admin.html">Go to Admin Portal →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SCREEN: DASHBOARD ═══════ -->
+<div class="screen" id="s-dashboard">
+  <div class="topbar">
+    <div class="tb-brand">
+      <div class="tb-logo">
+        <img src="school-logo.png" alt="Logo" onerror="this.outerHTML='🏫'">
+      </div>
+      <span class="tb-name" id="tb-school-name">CBT Portal</span>
+    </div>
+    <div class="tb-right">
+      <div class="student-chip">
+        <div class="chip-avatar" id="chip-initial">S</div>
+        <div class="chip-text">
+          <div class="cn" id="chip-name">Student</div>
+          <div class="cc" id="chip-class">Class</div>
+        </div>
+      </div>
+      <button class="btn-out" onclick="doLogout()">Log Out</button>
+    </div>
+  </div>
+
+  <div class="dash-body">
+    <div class="dash-welcome">
+      <div>
+        <h1>Welcome, <span id="greet-name">Student</span></h1>
+        <p>Select a subject to begin. Make sure you are fully ready before starting.</p>
+      </div>
+      <div class="dash-date" id="dash-date"></div>
+    </div>
+    <div class="subjects-heading">Available Examinations</div>
+    <div class="subjects-grid" id="subjects-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: CONFIRM START ═══════ -->
+<div class="overlay" id="confirm-overlay">
+  <div class="modal">
+    <div class="modal-emoji">📝</div>
+    <h2>Ready to Start?</h2>
+    <p>You are about to begin your <strong id="m-subject">Subject</strong> examination.</p>
+    <div class="modal-meta-box">
+      <div class="meta-row"><span>Questions</span><span id="m-qcount">—</span></div>
+      <div class="meta-row"><span>Time Allowed</span><span id="m-time">—</span></div>
+      <div class="meta-row"><span>Candidate</span><span id="m-candidate">—</span></div>
+    </div>
+    <div class="instructions-box" id="m-instructions">Answer all questions. The timer starts immediately.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeConfirm()">No, Go Back</button>
+      <button class="btn-start" onclick="beginExam()">Yes, Start Exam →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SCREEN: EXAM ═══════ -->
+<div class="screen" id="s-exam">
+  <div class="exam-bar">
+    <div class="exam-bar-left">
+      <div class="exam-subject-tag" id="exam-subj-tag">Subject</div>
+      <div class="exam-candidate-tag" id="exam-cand-tag">Candidate</div>
+    </div>
+    <div class="timer-chip">
+      <div>
+        <div class="timer-label">Time Left</div>
+        <div id="timer">00:00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exam-main">
+    <!-- Question area -->
+    <div class="q-panel">
+      <div class="q-header">
+        <span class="q-counter" id="q-counter">Question 1 of 1</span>
+        <div class="q-progress-track">
+          <div class="q-progress-fill" id="q-progress" style="width:0%"></div>
+        </div>
+        <div class="q-num-badge" id="q-num-badge">Q 1</div>
+      </div>
+
+      <div class="q-text" id="q-text">Loading…</div>
+      <div class="options" id="options"></div>
+
+      <div class="q-footer">
+        <button class="btn-qnav" onclick="prevQ()">← Prev</button>
+        <button class="btn-submit-exam" onclick="trySubmit()">Submit Exam ✓</button>
+        <button class="btn-qnav" onclick="nextQ()">Next →</button>
+      </div>
+    </div>
+
+    <!-- Navigator panel -->
+    <div class="nav-panel">
+      <div class="nav-panel-title">Question Navigator</div>
+      <div class="q-grid" id="q-grid"></div>
+      <div class="legend">
+        <div class="leg-row"><div class="leg-dot now"></div><span>Current</span></div>
+        <div class="leg-row"><div class="leg-dot done"></div><span>Answered</span></div>
+        <div class="leg-row"><div class="leg-dot blank"></div><span>Not answered</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SCREEN: RESULT ═══════ -->
+<div class="screen" id="s-result">
+  <div class="result-wrap">
+    <div class="result-emoji" id="r-emoji">🎉</div>
+    <h1 id="r-heading">Submitted!</h1>
+    <p class="rs" id="r-sub">Your responses have been recorded and marked.</p>
+    <div class="timeout-note" id="timeout-note">⏰ Your time ran out — exam was automatically submitted.</div>
+
+    <div class="score-donut">
+      <div class="donut-bg" id="donut-bg" style="--pct: 0%">
+        <div class="donut-inner">
+          <div class="donut-pct" id="r-pct">0%</div>
+          <div class="donut-lbl">Score</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-stats">
+      <div class="rs-item"><div class="rs-val" id="r-correct">0</div><div class="rs-lbl">Correct</div></div>
+      <div class="rs-item"><div class="rs-val" id="r-wrong">0</div><div class="rs-lbl">Wrong</div></div>
+      <div class="rs-item"><div class="rs-val" id="r-skipped">0</div><div class="rs-lbl">Skipped</div></div>
+    </div>
+
+    <button class="btn-home" onclick="doLogout()">← Return to Portal</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════
+   DATA LAYER  (shared localStorage key: cbt_data)
+═══════════════════════════════════ */
+const STORE = 'cbt_data';
+
+function loadDB() {
+  const raw = localStorage.getItem(STORE);
+  return raw ? JSON.parse(raw) : {
+    adminId: 'admin', adminPass: 'admin123',
+    schoolName: 'Cityside Secondary School',
+    students: [], exams: [], results: [], settings: {}
+  };
+}
+
+function saveDB(db) { localStorage.setItem(STORE, JSON.stringify(db)); }
+
+let DB = loadDB();
+
+/* ═══════════════════════════════════
+   SCREEN SWITCHER
+═══════════════════════════════════ */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ═══════════════════════════════════
+   LOGIN
+═══════════════════════════════════ */
+function doLogin() {
+  DB = loadDB();
+  const u = document.getElementById('f-user').value.trim().toLowerCase();
+  const p = document.getElementById('f-pass').value.trim();
+  const err = document.getElementById('login-err');
+  err.style.display = 'none';
+
+  if (!u || !p) { err.textContent = 'Please enter your username and password.'; err.style.display = 'block'; return; }
+
+  const student = DB.students.find(s => s.surname.toLowerCase() === u && s.admNo === p);
+  if (!student) { err.textContent = 'Incorrect username or password.'; err.style.display = 'block'; return; }
+
+  currentStudent = student;
+  setupDashboard();
+  show('s-dashboard');
+}
+
+function doLogout() {
+  clearInterval(timerInt);
+  currentStudent = null; currentExam = null;
+  answers = {}; timedOut = false;
+  document.getElementById('f-user').value = '';
+  document.getElementById('f-pass').value = '';
+  show('s-login');
+}
+
+/* ═══════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════ */
+let currentStudent = null, currentExam = null;
+let answers = {}, qIdx = 0, timerInt = null, timerSecs = 0, timedOut = false;
+let pendingId = null;
+
+function setupDashboard() {
+  DB = loadDB();
+  const s = currentStudent;
+  document.getElementById('tb-school-name').textContent = DB.schoolName || 'CBT Portal';
+  document.getElementById('hero-name').textContent = DB.schoolName || '';
+  document.getElementById('greet-name').textContent = s.firstName;
+  document.getElementById('chip-name').textContent = `${s.firstName} ${s.surname}`;
+  document.getElementById('chip-class').textContent = s.class;
+  document.getElementById('chip-initial').textContent = s.surname[0].toUpperCase();
+
+  const now = new Date();
+  document.getElementById('dash-date').textContent = now.toLocaleDateString('en-NG', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  const myExams = DB.exams.filter(e => e.studentClass === s.class);
+  const grid = document.getElementById('subjects-grid');
+
+  if (!myExams.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="ei">📋</div><p>No examinations are currently available for your class.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = myExams.map(e => `
+    <div class="subject-card" onclick="openConfirm('${e.id}')">
+      <div class="sc-icon">${e.icon || '📚'}</div>
+      <div class="sc-title">${e.subject}</div>
+      <div class="sc-meta">${e.questions.length} questions &nbsp;·&nbsp; ${e.time} minutes</div>
+      <div class="sc-pill">Available Now</div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════
+   CONFIRM MODAL
+═══════════════════════════════════ */
+function openConfirm(id) {
+  DB = loadDB();
+  pendingId = id;
+  const e = DB.exams.find(x => x.id === id);
+  document.getElementById('m-subject').textContent = e.subject;
+  document.getElementById('m-qcount').textContent = `${e.questions.length} questions`;
+  document.getElementById('m-time').textContent = `${e.time} minutes`;
+  document.getElementById('m-candidate').textContent = `${currentStudent.firstName} ${currentStudent.surname}`;
+  document.getElementById('m-instructions').textContent = e.instructions || 'Answer all questions carefully. The timer begins immediately.';
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  pendingId = null;
+}
+
+/* ═══════════════════════════════════
+   EXAM ENGINE
+═══════════════════════════════════ */
+function beginExam() {
+  closeConfirm();
+  DB = loadDB();
+  currentExam = DB.exams.find(e => e.id === pendingId);
+  qIdx = 0; answers = {}; timedOut = false;
+
+  document.getElementById('exam-subj-tag').textContent = currentExam.subject;
+  document.getElementById('exam-cand-tag').textContent = `${currentStudent.firstName} ${currentStudent.surname}`;
+
+  buildNavGrid();
+  renderQ();
+  startTimer(currentExam.time * 60);
+  show('s-exam');
+}
+
+function renderQ() {
+  const qs = currentExam.questions;
+  const q = qs[qIdx];
+  const total = qs.length;
+
+  document.getElementById('q-counter').textContent = `Question ${qIdx + 1} of ${total}`;
+  document.getElementById('q-num-badge').textContent = `Q ${qIdx + 1}`;
+  document.getElementById('q-progress').style.width = `${((qIdx + 1) / total) * 100}%`;
+  document.getElementById('q-text').textContent = q.question;
+
+  const sel = answers[qIdx];
+  const opts = [['A', q.a], ['B', q.b], ['C', q.c], ['D', q.d]];
+
+  document.getElementById('options').innerHTML = opts.map(([k, txt]) => `
+    <button class="opt ${sel === k ? 'picked' : ''}" onclick="pickAnswer('${k}')">
+      <div class="opt-key">${k}</div>
+      <div class="opt-text">${txt}</div>
+    </button>
+  `).join('');
+
+  refreshNavGrid();
+}
+
+function pickAnswer(k) { answers[qIdx] = k; renderQ(); }
+function nextQ() { if (qIdx < currentExam.questions.length - 1) { qIdx++; renderQ(); } }
+function prevQ() { if (qIdx > 0) { qIdx--; renderQ(); } }
+
+function buildNavGrid() {
+  document.getElementById('q-grid').innerHTML = currentExam.questions.map((_, i) =>
+    `<button class="qg-btn" id="qgb-${i}" onclick="jumpQ(${i})">${i + 1}</button>`
+  ).join('');
+}
+
+function refreshNavGrid() {
+  currentExam.questions.forEach((_, i) => {
+    const b = document.getElementById(`qgb-${i}`);
+    if (!b) return;
+    b.className = 'qg-btn';
+    if (i === qIdx) b.classList.add('now');
+    else if (answers[i]) b.classList.add('done');
+  });
+}
+
+function jumpQ(i) { qIdx = i; renderQ(); }
+
+/* ═══════════════════════════════════
+   TIMER
+═══════════════════════════════════ */
+function startTimer(secs) {
+  clearInterval(timerInt);
+  timerSecs = secs;
+  tickTimer();
+  timerInt = setInterval(() => {
+    timerSecs--;
+    tickTimer();
+    if (timerSecs <= 0) { clearInterval(timerInt); timedOut = true; finalSubmit(); }
+  }, 1000);
+}
+
+function tickTimer() {
+  const m = String(Math.floor(timerSecs / 60)).padStart(2, '0');
+  const s = String(timerSecs % 60).padStart(2, '0');
+  const el = document.getElementById('timer');
+  el.textContent = `${m}:${s}`;
+  el.className = timerSecs <= 60 ? 'crit' : timerSecs <= 300 ? 'warn' : '';
+}
+
+/* ═══════════════════════════════════
+   SUBMIT
+═══════════════════════════════════ */
+function trySubmit() {
+  const skipped = currentExam.questions.length - Object.keys(answers).length;
+  const msg = skipped > 0
+    ? `You have ${skipped} unanswered question(s). Submit anyway?`
+    : 'Submit your exam now?';
+  if (confirm(msg)) finalSubmit();
+}
+
+function finalSubmit() {
+  clearInterval(timerInt);
+  const qs = currentExam.questions;
+  let correct = 0;
+
+  qs.forEach((q, i) => {
+    if (answers[i] && answers[i].toUpperCase() === q.answer.toUpperCase()) correct++;
+  });
+
+  const total = qs.length;
+  const wrong = qs.filter((q, i) => answers[i] && answers[i].toUpperCase() !== q.answer.toUpperCase()).length;
+  const skipped = total - Object.keys(answers).length;
+  const pct = total ? Math.round((correct / total) * 100) : 0;
+
+  // Save to DB
+  DB = loadDB();
+  DB.results.push({
+    studentId: currentStudent.admNo,
+    studentName: `${currentStudent.firstName} ${currentStudent.surname}`,
+    class: currentStudent.class,
+    subject: currentExam.subject,
+    correct, wrong, skipped, total, pct,
+    date: new Date().toLocaleString('en-NG'),
+    timeout: timedOut
+  });
+  saveDB(DB);
+
+  // Render result
+  const icon = pct >= 70 ? '🎉' : pct >= 50 ? '👍' : '📚';
+  const heading = pct >= 70 ? 'Excellent Work!' : pct >= 50 ? 'Good Effort!' : 'Keep Pushing!';
+  document.getElementById('r-emoji').textContent = icon;
+  document.getElementById('r-heading').textContent = heading;
+  document.getElementById('r-sub').textContent = `${currentStudent.firstName}, here are your results for ${currentExam.subject}.`;
+  document.getElementById('r-pct').textContent = `${pct}%`;
+  document.getElementById('r-correct').textContent = correct;
+  document.getElementById('r-wrong').textContent = wrong;
+  document.getElementById('r-skipped').textContent = skipped;
+  document.getElementById('timeout-note').style.display = timedOut ? 'block' : 'none';
+
+  // Donut
+  document.getElementById('donut-bg').style.setProperty('--pct', `${pct}%`);
+
+  show('s-result');
+}
+
+/* ═══════════════════════════════════
+   INIT
+═══════════════════════════════════ */
+(function() {
+  DB = loadDB();
+  if (DB.schoolName) document.getElementById('hero-name').textContent = DB.schoolName;
+})();
+</script>
+</body>
+</html>

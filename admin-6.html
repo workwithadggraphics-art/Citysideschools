@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT Admin Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --g:  #059669;
+    --g2: #047857;
+    --g3: #064e3b;
+    --gl: #d1fae5;
+    --gx: #a7f3d0;
+    --glow: rgba(5,150,105,0.15);
+    --ow: #f9f6ef;
+    --ow2: #f0ead8;
+    --cream: #fdfaf3;
+    --ink: #1c2b22;
+    --mid: #3d5a4a;
+    --soft: #7a9a86;
+    --border: rgba(5,150,105,0.18);
+    --card-shadow: 0 4px 24px rgba(4,120,87,0.08);
+    --red: #dc2626; --red-bg: #fef2f2; --red-border: #fca5a5;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Outfit', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* ════════════════════════════════
+     ADMIN LOGIN
+  ════════════════════════════════ */
+  #a-login { align-items: stretch; }
+
+  .al-hero {
+    flex: 1.3; position: relative;
+    background: var(--g3);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end;
+    padding: 0 0 64px; overflow: hidden;
+  }
+
+  .al-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; opacity: 0.2;
+  }
+
+  .al-grad {
+    position: absolute; inset: 0;
+    background: linear-gradient(170deg, rgba(6,78,59,0.5) 0%, rgba(6,78,59,0.96) 68%);
+  }
+
+  .orb {
+    position: absolute; border-radius: 50%;
+    background: rgba(16,185,129,0.07);
+    border: 1px solid rgba(16,185,129,0.1);
+  }
+  .o1 { width: 300px; height: 300px; top: -80px; right: -80px; }
+  .o2 { width: 200px; height: 200px; top: 180px; left: -60px; }
+  .o3 { width: 130px; height: 130px; bottom: 210px; right: 24px; }
+
+  .al-content { position: relative; z-index: 2; text-align: center; padding: 0 44px; }
+
+  .al-logo-wrap {
+    width: 92px; height: 92px; border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.28);
+    background: rgba(255,255,255,0.09);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  .al-logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .logo-ph { font-size: 2.4rem; }
+
+  .al-school {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.85rem; color: #fff; line-height: 1.2; margin-bottom: 8px;
+  }
+
+  .al-location {
+    font-size: 0.8rem; color: rgba(255,255,255,0.55);
+    letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 28px;
+  }
+
+  .al-divider {
+    width: 48px; height: 2px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent);
+    margin: 0 auto 22px;
+  }
+
+  .al-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 6px 16px;
+    font-size: 0.8rem; color: rgba(255,255,255,0.8);
+    letter-spacing: 0.05em;
+  }
+
+  .al-panel {
+    width: 420px; background: var(--ow);
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 56px 44px; position: relative;
+  }
+
+  .al-panel::before {
+    content: ''; position: absolute;
+    left: 0; top: 12%; bottom: 12%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--border), transparent);
+  }
+
+  .panel-eyebrow {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--gl); border: 1px solid var(--gx);
+    border-radius: 20px; padding: 5px 14px;
+    font-size: 0.75rem; font-weight: 700;
+    color: var(--g2); text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 18px;
+  }
+
+  .panel-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.1rem; color: var(--ink); line-height: 1.15; margin-bottom: 8px;
+  }
+
+  .panel-sub { font-size: 0.87rem; color: var(--soft); margin-bottom: 34px; line-height: 1.6; }
+
+  .field { margin-bottom: 18px; }
+
+  .field label {
+    display: block; font-size: 0.73rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--mid); margin-bottom: 7px;
+  }
+
+  .field-wrap { position: relative; }
+
+  .fi {
+    position: absolute; left: 14px; top: 50%;
+    transform: translateY(-50%); font-size: 0.95rem;
+    color: var(--soft); pointer-events: none;
+  }
+
+  .field input {
+    width: 100%; padding: 13px 14px 13px 42px;
+    border: 1.5px solid var(--border); border-radius: 11px;
+    background: #fff; font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem; color: var(--ink); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .field input:focus { border-color: var(--g); box-shadow: 0 0 0 3px var(--glow); }
+  .field input::placeholder { color: #b8cdc4; }
+
+  .err-box {
+    display: none; background: var(--red-bg);
+    border: 1.5px solid var(--red-border); border-radius: 10px;
+    padding: 10px 14px; font-size: 0.84rem;
+    color: #991b1b; margin-bottom: 16px;
+  }
+
+  .btn-login {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, var(--g), var(--g3));
+    border: none; border-radius: 11px; color: #fff;
+    font-family: 'Outfit', sans-serif; font-size: 1rem;
+    font-weight: 600; letter-spacing: 0.02em;
+    cursor: pointer; transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 6px 20px var(--glow); margin-top: 4px;
+  }
+
+  .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(5,150,105,0.28); }
+  .btn-login:active { transform: scale(0.98); }
+
+  .back-link { margin-top: 26px; text-align: center; font-size: 0.8rem; color: var(--soft); }
+  .back-link a { color: var(--g2); font-weight: 600; text-decoration: none; }
+
+  /* ════════════════════════════════
+     ADMIN SHELL
+  ════════════════════════════════ */
+  #a-shell { flex-direction: column; }
+
+  .admin-topbar {
+    height: 64px; background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 90;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.04);
+  }
+
+  .atb-left { display: flex; align-items: center; gap: 14px; }
+
+  .atb-logo {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2px solid var(--g); background: var(--gl);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; overflow: hidden;
+  }
+
+  .atb-logo img { width: 100%; height: 100%; object-fit: cover; }
+
+  .atb-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem; color: var(--g3); font-weight: 600;
+  }
+
+  .atb-right { display: flex; align-items: center; gap: 12px; }
+
+  .admin-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--ow); border: 1.5px solid var(--border);
+    border-radius: 40px; padding: 4px 14px 4px 5px;
+  }
+
+  .admin-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--g3), #022c22);
+    color: #fff; font-size: 0.75rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .admin-chip span { font-size: 0.82rem; font-weight: 500; color: var(--mid); }
+
+  .btn-out {
+    padding: 7px 16px; border: 1.5px solid var(--border);
+    border-radius: 8px; background: transparent;
+    color: var(--mid); font-family: 'Outfit', sans-serif;
+    font-size: 0.82rem; font-weight: 500;
+    cursor: pointer; transition: all 0.18s;
+  }
+
+  .btn-out:hover { border-color: var(--red); color: var(--red); }
+
+  /* Layout */
+  .admin-body { display: flex; flex: 1; min-height: calc(100vh - 64px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 228px; background: #fff;
+    border-right: 1.5px solid var(--border);
+    padding: 22px 12px;
+    display: flex; flex-direction: column;
+    position: sticky; top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+
+  .sb-section {
+    font-size: 0.68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--soft); padding: 14px 10px 5px;
+  }
+
+  .sb-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    cursor: pointer; font-size: 0.88rem; font-weight: 500;
+    color: var(--mid); transition: all 0.16s;
+    margin-bottom: 2px;
+  }
+
+  .sb-item .ico { font-size: 1rem; }
+
+  .sb-item:hover { background: var(--gl); color: var(--g2); }
+
+  .sb-item.on {
+    background: var(--gl); color: var(--g2);
+    font-weight: 600;
+  }
+
+  .sb-count {
+    margin-left: auto;
+    background: var(--g2); color: #fff;
+    font-size: 0.68rem; font-weight: 700;
+    padding: 2px 7px; border-radius: 20px;
+    min-width: 20px; text-align: center;
+  }
+
+  /* CONTENT AREA */
+  .content { flex: 1; padding: 32px 36px; overflow-y: auto; }
+
+  .tab-panel { display: none; }
+  .tab-panel.on { display: block; }
+
+  /* Section header */
+  .sec-header { margin-bottom: 26px; }
+
+  .sec-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.9rem; color: var(--ink); margin-bottom: 4px;
+  }
+
+  .sec-header p { font-size: 0.88rem; color: var(--soft); }
+
+  /* Stats row */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4,1fr);
+    gap: 14px; margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: #fff; border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 20px 18px;
+    box-shadow: var(--card-shadow); position: relative; overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(to right, var(--g), var(--g2));
+  }
+
+  .stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem; font-weight: 700;
+    color: var(--g2); line-height: 1;
+  }
+
+  .stat-lbl { font-size: 0.8rem; color: var(--soft); margin-top: 4px; }
+
+  /* Cards */
+  .card {
+    background: #fff; border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 26px 28px;
+    margin-bottom: 20px; box-shadow: var(--card-shadow);
+  }
+
+  .card h3 {
+    font-size: 0.95rem; font-weight: 700;
+    color: var(--ink); margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Forms */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-grid.one { grid-template-columns: 1fr; }
+
+  .ff label {
+    display: block; font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--mid); margin-bottom: 6px;
+  }
+
+  .ff input, .ff select, .ff textarea {
+    width: 100%; padding: 11px 13px;
+    border: 1.5px solid var(--border); border-radius: 9px;
+    background: var(--cream); font-family: 'Outfit', sans-serif;
+    font-size: 0.92rem; color: var(--ink); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .ff input:focus, .ff select:focus, .ff textarea:focus {
+    border-color: var(--g); box-shadow: 0 0 0 3px var(--glow);
+  }
+
+  .ff textarea { resize: vertical; min-height: 78px; }
+
+  .btn-add {
+    padding: 11px 22px;
+    background: linear-gradient(135deg, var(--g), var(--g2));
+    border: none; border-radius: 9px; color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; transition: all 0.18s;
+    box-shadow: 0 4px 12px var(--glow);
+  }
+
+  .btn-add:hover { transform: translateY(-1px); box-shadow: 0 7px 18px rgba(5,150,105,0.28); }
+
+  /* Tables */
+  .tbl-wrap { overflow-x: auto; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+
+  thead th {
+    text-align: left; padding: 9px 13px;
+    font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--soft); border-bottom: 1.5px solid var(--border);
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 12px 13px; border-bottom: 1px solid var(--ow2);
+    color: var(--ink); vertical-align: middle;
+  }
+
+  tbody tr:hover td { background: var(--cream); }
+
+  .badge {
+    display: inline-block; padding: 2px 10px;
+    border-radius: 20px; font-size: 0.73rem; font-weight: 600;
+  }
+
+  .badge-class { background: var(--gl); color: var(--g2); }
+  .badge-active { background: var(--gl); color: var(--g2); }
+  .badge-pass { background: #dcfce7; color: #166534; }
+  .badge-fail { background: #fef2f2; color: #991b1b; }
+  .badge-timeout { background: #fff7ed; color: #9a3412; }
+
+  .btn-del {
+    padding: 4px 11px; background: var(--red-bg);
+    border: 1px solid var(--red-border); border-radius: 7px;
+    color: var(--red); font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+  }
+
+  .btn-del:hover { background: var(--red-border); }
+
+  .empty-row td { text-align: center; padding: 40px; color: var(--soft); font-size: 0.9rem; }
+
+  /* Upload zone */
+  .upload-zone {
+    border: 2px dashed var(--border); border-radius: 13px;
+    padding: 36px; text-align: center;
+    cursor: pointer; transition: all 0.2s;
+    background: var(--cream); position: relative;
+    margin-bottom: 12px;
+  }
+
+  .upload-zone:hover { border-color: var(--g); background: var(--gl); }
+  .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .upload-zone .uz-icon { font-size: 2.2rem; margin-bottom: 8px; }
+  .upload-zone p { font-size: 0.85rem; color: var(--soft); line-height: 1.7; }
+  .upload-zone strong { color: var(--g2); }
+
+  .file-badge {
+    display: none; align-items: center; justify-content: space-between;
+    background: var(--gl); border: 1.5px solid var(--g);
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+  }
+
+  .file-badge.show { display: flex; }
+  .file-badge .fn { font-weight: 600; color: var(--g2); font-size: 0.88rem; }
+  .file-badge .fok { font-size: 0.8rem; color: var(--g2); }
+
+  /* Format guide */
+  .fmt-guide {
+    background: #fffbeb; border: 1.5px solid #fde68a;
+    border-radius: 11px; padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+
+  .fmt-guide h4 { font-size: 0.85rem; font-weight: 700; color: #78350f; margin-bottom: 8px; }
+  .fmt-guide p { font-size: 0.82rem; color: #92400e; line-height: 1.75; }
+  .fmt-guide code { background: #fef3c7; padding: 1px 5px; border-radius: 4px; font-size: 0.82em; }
+
+  /* Info panels */
+  .info-panel {
+    border-radius: 12px; padding: 16px 18px; margin-bottom: 18px;
+  }
+
+  .info-panel.blue { background: #eff6ff; border: 1.5px solid #bfdbfe; }
+  .info-panel.blue h4 { color: #1e40af; margin-bottom: 6px; font-size: 0.88rem; }
+  .info-panel.blue p { font-size: 0.83rem; color: #1e3a8a; line-height: 1.7; }
+  .info-panel.blue code { background: #dbeafe; padding: 2px 5px; border-radius: 4px; font-size: 0.85em; }
+
+  .info-panel.green { background: #f0fdf4; border: 1.5px solid var(--gx); }
+  .info-panel.green h4 { color: var(--g2); margin-bottom: 6px; font-size: 0.88rem; }
+  .info-panel.green p { font-size: 0.83rem; color: var(--g3); line-height: 1.7; }
+  .info-panel.green code { background: var(--gl); padding: 2px 5px; border-radius: 4px; font-size: 0.85em; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--ink); color: #fff;
+    padding: 12px 22px; border-radius: 10px;
+    font-size: 0.88rem; font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    z-index: 999; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Filter row */
+  .filter-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px; flex-wrap: wrap;
+  }
+
+  .filter-row select {
+    padding: 7px 12px; border: 1.5px solid var(--border);
+    border-radius: 8px; background: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem; color: var(--ink); outline: none;
+  }
+
+  .filter-row select:focus { border-color: var(--g); }
+
+  .filter-label { font-size: 0.8rem; color: var(--soft); font-weight: 500; }
+
+  /* Score ring in results */
+  .pct-pill {
+    display: inline-block;
+    padding: 2px 10px; border-radius: 20px;
+    font-weight: 700; font-size: 0.82rem;
+  }
+
+  /* Recent activity */
+  .activity-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .activity-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px;
+    background: var(--cream); border-radius: 10px;
+    font-size: 0.87rem;
+  }
+
+  .activity-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .activity-text { flex: 1; color: var(--ink); line-height: 1.4; }
+  .activity-time { font-size: 0.75rem; color: var(--soft); }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    #a-login { flex-direction: column; }
+    .al-hero { flex: 0 0 240px; }
+    .al-panel { width: 100%; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid.three { grid-template-columns: 1fr; }
+    .admin-body { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap; padding: 12px; border-right: none; border-bottom: 1.5px solid var(--border); }
+    .sb-section { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════ SCREEN: ADMIN LOGIN ═══════ -->
+<div class="screen active" id="a-login">
+  <div class="al-hero">
+    <div class="orb o1"></div>
+    <div class="orb o2"></div>
+    <div class="orb o3"></div>
+    <!-- ↓ Replace with your school image -->
+    <img class="al-img" src="school-image.jpg" alt="School" onerror="this.style.display='none'">
+    <div class="al-grad"></div>
+    <div class="al-content">
+      <div class="al-logo-wrap">
+        <!-- ↓ Replace with your school logo -->
+        <img src="school-logo.png" alt="Logo" onerror="this.outerHTML='<span class=logo-ph>🏫</span>'">
+      </div>
+      <!-- ↓ Change school name here -->
+      <div class="al-school" id="hero-school-name">Cityside Secondary School</div>
+      <div class="al-location">Sagamu, Ogun State · Nigeria</div>
+      <div class="al-divider"></div>
+      <div class="al-badge">🔐 &nbsp; Administrator Access</div>
+    </div>
+  </div>
+
+  <div class="al-panel">
+    <div class="panel-eyebrow">⚙️ Admin Portal</div>
+    <div class="panel-title">Admin<br>Sign In</div>
+    <p class="panel-sub">Restricted access. Enter your administrator credentials to continue.</p>
+
+    <div class="err-box" id="admin-err">Incorrect Admin ID or password.</div>
+
+    <div class="field">
+      <label>Admin ID</label>
+      <div class="field-wrap">
+        <span class="fi">🪪</span>
+        <input type="text" id="a-id" placeholder="Enter Admin ID" autocomplete="off">
+      </div>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="field-wrap">
+        <span class="fi">🔑</span>
+        <input type="password" id="a-pass" placeholder="Enter password">
+      </div>
+    </div>
+
+    <button class="btn-login" onclick="doAdminLogin()">Access Admin Panel →</button>
+
+    <div class="back-link">
+      Student portal? <a href="student.html">Go to Student Login →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SCREEN: ADMIN SHELL ═══════ -->
+<div class="screen" id="a-shell">
+  <!-- TOP BAR -->
+  <div class="admin-topbar">
+    <div class="atb-left">
+      <div class="atb-logo">
+        <img src="school-logo.png" alt="Logo" onerror="this.outerHTML='🏫'">
+      </div>
+      <span class="atb-title" id="atb-school">CBT Admin Panel</span>
+    </div>
+    <div class="atb-right">
+      <div class="admin-chip">
+        <div class="admin-avatar">A</div>
+        <span>Administrator</span>
+      </div>
+      <button class="btn-out" onclick="doLogout()">Log Out</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-section">Overview</div>
+      <div class="sb-item on" onclick="switchTab('overview')" data-tab="overview">
+        <span class="ico">📊</span> Dashboard
+      </div>
+
+      <div class="sb-section">Management</div>
+      <div class="sb-item" onclick="switchTab('students')" data-tab="students">
+        <span class="ico">👨‍🎓</span> Students
+        <span class="sb-count" id="sb-students-count">0</span>
+      </div>
+      <div class="sb-item" onclick="switchTab('questions')" data-tab="questions">
+        <span class="ico">📋</span> Exams & Questions
+        <span class="sb-count" id="sb-exams-count">0</span>
+      </div>
+
+      <div class="sb-section">Reports</div>
+      <div class="sb-item" onclick="switchTab('results')" data-tab="results">
+        <span class="ico">📈</span> Results
+        <span class="sb-count" id="sb-results-count">0</span>
+      </div>
+
+      <div class="sb-section">System</div>
+      <div class="sb-item" onclick="switchTab('settings')" data-tab="settings">
+        <span class="ico">⚙️</span> Settings
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ── TAB: OVERVIEW ── -->
+      <div class="tab-panel on" id="tab-overview">
+        <div class="sec-header">
+          <h2>Dashboard</h2>
+          <p>Portal activity at a glance.</p>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-val" id="ov-students">0</div><div class="stat-lbl">Registered Students</div></div>
+          <div class="stat-card"><div class="stat-val" id="ov-exams">0</div><div class="stat-lbl">Exams Configured</div></div>
+          <div class="stat-card"><div class="stat-val" id="ov-results">0</div><div class="stat-lbl">Results Recorded</div></div>
+          <div class="stat-card"><div class="stat-val" id="ov-subjects">0</div><div class="stat-lbl">Subjects Loaded</div></div>
+        </div>
+        <div class="card">
+          <h3>📋 Recent Activity</h3>
+          <div class="activity-list" id="activity-list">
+            <div style="color:var(--soft);font-size:0.88rem;padding:16px 0">No activity recorded yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: STUDENTS ── -->
+      <div class="tab-panel" id="tab-students">
+        <div class="sec-header">
+          <h2>Student Management</h2>
+          <p>Register students per class. Each student logs in with their Surname and Admission Number.</p>
+        </div>
+
+        <div class="card">
+          <h3>➕ Add New Student</h3>
+          <div class="form-grid">
+            <div class="ff">
+              <label>Surname (Username)</label>
+              <input type="text" id="s-surname" placeholder="e.g. Adeyemi">
+            </div>
+            <div class="ff">
+              <label>First Name</label>
+              <input type="text" id="s-firstname" placeholder="e.g. Toluwani">
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="ff">
+              <label>Admission Number (Password)</label>
+              <input type="text" id="s-admno" placeholder="e.g. CSS/2025/001">
+            </div>
+            <div class="ff">
+              <label>Class</label>
+              <select id="s-class">
+                <option value="">— Select Class —</option>
+                <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+                <option>SSS 1</option><option>SSS 2</option><option>SSS 3</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-add" onclick="addStudent()">+ Add Student</button>
+        </div>
+
+        <div class="card">
+          <h3>👨‍🎓 Student List</h3>
+          <div class="filter-row">
+            <span class="filter-label">Filter by class:</span>
+            <select id="filter-class" onchange="renderStudents()">
+              <option value="">All Classes</option>
+              <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+              <option>SSS 1</option><option>SSS 2</option><option>SSS 3</option>
+            </select>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Surname</th><th>First Name</th><th>Admission No.</th><th>Class</th><th>Action</th></tr></thead>
+              <tbody id="students-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: QUESTIONS / EXAMS ── -->
+      <div class="tab-panel" id="tab-questions">
+        <div class="sec-header">
+          <h2>Exams &amp; Questions</h2>
+          <p>Configure exams per subject and class, upload questions, set time and instructions. Changes are live immediately.</p>
+        </div>
+
+        <div class="fmt-guide">
+          <h4>📄 Question Document Format (.txt or .docx as plain text)</h4>
+          <p>
+            Each question block (separated by a blank line):<br>
+            <code>1. What is the capital of Nigeria?</code><br>
+            <code>A. Lagos &nbsp;&nbsp; B. Abuja &nbsp;&nbsp; C. Kano &nbsp;&nbsp; D. Ibadan</code><br>
+            or on separate lines: <code>A. Lagos</code> then <code>B. Abuja</code> etc.<br>
+            Last line of block: <code>ANSWER: B</code><br><br>
+            The <code>ANSWER:</code> line is used for auto-marking only — students never see it.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>⚙️ Configure New Exam</h3>
+          <div class="form-grid">
+            <div class="ff">
+              <label>Subject Name</label>
+              <input type="text" id="e-subject" placeholder="e.g. Mathematics">
+            </div>
+            <div class="ff">
+              <label>Class</label>
+              <select id="e-class">
+                <option value="">— Select Class —</option>
+                <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+                <option>SSS 1</option><option>SSS 2</option><option>SSS 3</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="ff">
+              <label>Time Allowed (minutes)</label>
+              <input type="number" id="e-time" placeholder="e.g. 60" min="5" max="180">
+            </div>
+            <div class="ff">
+              <label>Subject Icon (emoji)</label>
+              <input type="text" id="e-icon" placeholder="e.g. 📐" maxlength="2">
+            </div>
+          </div>
+          <div class="form-grid one" style="margin-bottom:16px">
+            <div class="ff">
+              <label>Exam Instructions (shown to students before they start)</label>
+              <textarea id="e-instructions" placeholder="e.g. Answer all 40 questions. Each carries 1 mark. No calculator. Submit before time runs out."></textarea>
+            </div>
+          </div>
+
+          <div class="ff" style="margin-bottom:6px">
+            <label>Upload Question File</label>
+          </div>
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="q-file" accept=".txt,.docx,.doc" onchange="handleUpload(event)">
+            <div class="uz-icon">📄</div>
+            <p><strong>Click to upload</strong> or drag & drop your question file</p>
+            <p>Accepted: .txt · .docx (as plain text) — see format guide above</p>
+          </div>
+          <div class="file-badge" id="file-badge">
+            <span class="fn" id="file-name">file.txt</span>
+            <span class="fok" id="file-ok">✓ 0 questions parsed</span>
+          </div>
+
+          <button class="btn-add" onclick="saveExam()">💾 Save Exam &amp; Go Live</button>
+        </div>
+
+        <div class="card">
+          <h3>📋 Configured Exams</h3>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Subject</th><th>Class</th><th>Questions</th><th>Time</th><th>Instructions</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="exams-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: RESULTS ── -->
+      <div class="tab-panel" id="tab-results">
+        <div class="sec-header">
+          <h2>Exam Results</h2>
+          <p>All submitted exam results across all classes and subjects.</p>
+        </div>
+        <div class="card">
+          <h3>📈 All Results</h3>
+          <div class="filter-row">
+            <span class="filter-label">Filter by class:</span>
+            <select id="res-filter-class" onchange="renderResults()">
+              <option value="">All Classes</option>
+              <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+              <option>SSS 1</option><option>SSS 2</option><option>SSS 3</option>
+            </select>
+            <select id="res-filter-subject" onchange="renderResults()">
+              <option value="">All Subjects</option>
+            </select>
+            <button class="btn-add" style="padding:7px 14px;font-size:0.8rem" onclick="exportCSV()">⬇ Export CSV</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Student</th><th>Class</th><th>Subject</th><th>Score</th><th>%</th><th>Status</th><th>Date / Time</th></tr></thead>
+              <tbody id="results-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: SETTINGS ── -->
+      <div class="tab-panel" id="tab-settings">
+        <div class="sec-header">
+          <h2>Settings</h2>
+          <p>Configure portal-wide options, admin credentials, and IP restriction.</p>
+        </div>
+
+        <div class="info-panel blue">
+          <h4>🔒 IP Restriction — How It Works</h4>
+          <p>
+            To prevent students from logging in from home, all student computers must be connected to the <strong>same local network (LAN / Wi-Fi)</strong> as the admin machine. The backend server runs on your machine and only accepts requests from IP addresses within your school's subnet.<br><br>
+            Students open the portal by navigating to your machine's local IP in their browser, e.g. <code>http://192.168.1.100:3000</code> — not a public URL. Anyone outside the school network cannot reach it.<br><br>
+            To find your local IP: open Command Prompt → type <code>ipconfig</code> (Windows) or open Terminal → <code>ifconfig</code> (Linux/Mac). Look for IPv4 Address under your active adapter.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>🏫 School Information</h3>
+          <div class="form-grid">
+            <div class="ff">
+              <label>School Name</label>
+              <input type="text" id="set-school-name" placeholder="e.g. Cityside Secondary School">
+            </div>
+            <div class="ff">
+              <label>School Location</label>
+              <input type="text" id="set-school-loc" placeholder="e.g. Sagamu, Ogun State">
+            </div>
+          </div>
+          <button class="btn-add" onclick="saveSchoolInfo()">💾 Save School Info</button>
+        </div>
+
+        <div class="card">
+          <h3>🌐 Network / IP Settings</h3>
+          <div class="form-grid">
+            <div class="ff">
+              <label>Server IP Address (Your Machine)</label>
+              <input type="text" id="set-server-ip" placeholder="e.g. 192.168.1.100">
+            </div>
+            <div class="ff">
+              <label>Allowed Subnet Range</label>
+              <input type="text" id="set-subnet" placeholder="e.g. 192.168.1.0/24">
+            </div>
+          </div>
+          <button class="btn-add" onclick="saveNetworkSettings()">💾 Save Network Settings</button>
+        </div>
+
+        <div class="card">
+          <h3>🔑 Update Admin Credentials</h3>
+          <div class="form-grid">
+            <div class="ff">
+              <label>New Admin ID</label>
+              <input type="text" id="set-admin-id" placeholder="New Admin ID">
+            </div>
+            <div class="ff">
+              <label>New Password</label>
+              <input type="password" id="set-admin-pass" placeholder="New password">
+            </div>
+          </div>
+          <button class="btn-add" onclick="updateAdminCreds()">🔑 Update Credentials</button>
+        </div>
+
+        <div class="card">
+          <h3>⚠️ Danger Zone</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn-del" style="padding:9px 18px;font-size:0.85rem" onclick="clearResults()">🗑 Clear All Results</button>
+            <button class="btn-del" style="padding:9px 18px;font-size:0.85rem" onclick="clearAll()">🗑 Reset Entire Portal</button>
+          </div>
+        </div>
+
+        <div class="info-panel green">
+          <h4>📦 Deployment Summary</h4>
+          <p>
+            <strong>Option A — Netlify + GitHub (no IP restriction, public URL):</strong><br>
+            Push <code>student.html</code> and <code>admin.html</code> to a GitHub repo. Connect to Netlify. Both files deploy automatically. Data is stored in <code>localStorage</code> — each browser maintains its own data.<br><br>
+            <strong>Option B — Local School Server (with IP restriction, recommended for exams):</strong><br>
+            Run a Node.js/Express server on the admin PC. Place both HTML files in the <code>/public</code> folder. Students access via the server's local IP. The backend validates IP on every login request and blocks external connections. Use Firebase Firestore for shared data across all machines on the network.<br><br>
+            When you're ready to build the Node.js backend, Claude can generate it for you — it will include Firebase integration, IP middleware, and a REST API for login/results.
+          </p>
+        </div>
+
+      </div><!-- /settings -->
+
+    </div><!-- /content -->
+  </div><!-- /admin-body -->
+</div><!-- /a-shell -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════
+   DATA LAYER
+═══════════════════════════════════ */
+const STORE = 'cbt_data';
+
+function loadDB() {
+  const raw = localStorage.getItem(STORE);
+  return raw ? JSON.parse(raw) : {
+    adminId: 'admin', adminPass: 'admin123',
+    schoolName: 'Cityside Secondary School',
+    schoolLocation: 'Sagamu, Ogun State',
+    students: [], exams: [], results: [],
+    settings: { serverIp: '', subnet: '' },
+    activity: []
+  };
+}
+
+function saveDB(db) { localStorage.setItem(STORE, JSON.stringify(db)); }
+
+let DB = loadDB();
+
+function logActivity(msg) {
+  DB.activity = DB.activity || [];
+  DB.activity.unshift({ msg, time: new Date().toLocaleString('en-NG') });
+  if (DB.activity.length > 20) DB.activity = DB.activity.slice(0, 20);
+  saveDB(DB);
+}
+
+/* ═══════════════════════════════════
+   SCREEN
+═══════════════════════════════════ */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ═══════════════════════════════════
+   TOAST
+═══════════════════════════════════ */
+function toast(msg, dur = 2800) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), dur);
+}
+
+/* ═══════════════════════════════════
+   ADMIN LOGIN
+═══════════════════════════════════ */
+function doAdminLogin() {
+  DB = loadDB();
+  const id = document.getElementById('a-id').value.trim();
+  const pw = document.getElementById('a-pass').value.trim();
+  const err = document.getElementById('admin-err');
+  err.style.display = 'none';
+
+  if (!id || !pw) { err.textContent = 'Please enter Admin ID and password.'; err.style.display = 'block'; return; }
+  if (id !== DB.adminId || pw !== DB.adminPass) { err.textContent = 'Incorrect Admin ID or password.'; err.style.display = 'block'; return; }
+
+  document.getElementById('atb-school').textContent = (DB.schoolName || 'CBT') + ' — Admin Panel';
+  loadSettingsFields();
+  refreshAll();
+  show('a-shell');
+}
+
+function doLogout() {
+  document.getElementById('a-id').value = '';
+  document.getElementById('a-pass').value = '';
+  show('a-login');
+}
+
+/* ═══════════════════════════════════
+   TAB SWITCHER
+═══════════════════════════════════ */
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
+  document.getElementById(`tab-${tab}`).classList.add('on');
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.toggle('on', i.dataset.tab === tab));
+
+  if (tab === 'results') { populateSubjectFilter(); renderResults(); }
+  if (tab === 'overview') renderOverview();
+}
+
+/* ═══════════════════════════════════
+   REFRESH ALL
+═══════════════════════════════════ */
+function refreshAll() {
+  DB = loadDB();
+  renderOverview();
+  renderStudents();
+  renderExams();
+  renderResults();
+  updateSidebarCounts();
+  populateSubjectFilter();
+}
+
+function updateSidebarCounts() {
+  document.getElementById('sb-students-count').textContent = DB.students.length;
+  document.getElementById('sb-exams-count').textContent = DB.exams.length;
+  document.getElementById('sb-results-count').textContent = DB.results.length;
+}
+
+/* ═══════════════════════════════════
+   OVERVIEW
+═══════════════════════════════════ */
+function renderOverview() {
+  document.getElementById('ov-students').textContent = DB.students.length;
+  document.getElementById('ov-exams').textContent = DB.exams.length;
+  document.getElementById('ov-results').textContent = DB.results.length;
+  document.getElementById('ov-subjects').textContent = [...new Set(DB.exams.map(e => e.subject))].length;
+
+  const list = document.getElementById('activity-list');
+  const acts = DB.activity || [];
+  if (!acts.length) {
+    list.innerHTML = '<div style="color:var(--soft);font-size:0.88rem;padding:12px 0">No activity recorded yet.</div>';
+    return;
+  }
+  list.innerHTML = acts.slice(0, 8).map(a => `
+    <div class="activity-item">
+      <div class="activity-icon">📌</div>
+      <div class="activity-text">${a.msg}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════
+   STUDENTS
+═══════════════════════════════════ */
+function addStudent() {
+  DB = loadDB();
+  const surname = document.getElementById('s-surname').value.trim();
+  const firstName = document.getElementById('s-firstname').value.trim();
+  const admNo = document.getElementById('s-admno').value.trim();
+  const cls = document.getElementById('s-class').value;
+
+  if (!surname || !firstName || !admNo || !cls) { toast('⚠️ Please fill all student fields.'); return; }
+  if (DB.students.find(s => s.admNo === admNo)) { toast('⚠️ Admission number already exists.'); return; }
+
+  DB.students.push({ id: Date.now().toString(), surname, firstName, admNo, class: cls });
+  logActivity(`Student added: ${firstName} ${surname} (${cls})`);
+  saveDB(DB);
+  renderStudents();
+  updateSidebarCounts();
+  toast(`✅ ${firstName} ${surname} added to ${cls}`);
+
+  document.getElementById('s-surname').value = '';
+  document.getElementById('s-firstname').value = '';
+  document.getElementById('s-admno').value = '';
+  document.getElementById('s-class').value = '';
+}
+
+function renderStudents() {
+  DB = loadDB();
+  const filter = document.getElementById('filter-class')?.value || '';
+  const list = filter ? DB.students.filter(s => s.class === filter) : DB.students;
+  const tbody = document.getElementById('students-tbody');
+
+  if (!list.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No students found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map((s, i) => `
+    <tr>
+      <td style="color:var(--soft)">${i + 1}</td>
+      <td><strong>${s.surname}</strong></td>
+      <td>${s.firstName}</td>
+      <td><code style="background:var(--cream);padding:2px 7px;border-radius:5px;font-size:0.82em">${s.admNo}</code></td>
+      <td><span class="badge badge-class">${s.class}</span></td>
+      <td><button class="btn-del" onclick="deleteStudent('${s.id}')">Delete</button></td>
+    </tr>
+  `).join('');
+}
+
+function deleteStudent(id) {
+  if (!confirm('Delete this student? They will no longer be able to log in.')) return;
+  DB = loadDB();
+  const s = DB.students.find(x => x.id === id);
+  DB.students = DB.students.filter(x => x.id !== id);
+  logActivity(`Student deleted: ${s ? s.firstName + ' ' + s.surname : id}`);
+  saveDB(DB);
+  renderStudents();
+  updateSidebarCounts();
+  toast('🗑 Student deleted.');
+}
+
+/* ═══════════════════════════════════
+   QUESTIONS / EXAMS — FILE UPLOAD
+═══════════════════════════════════ */
+let parsedQuestions = [];
+let uploadedFileName = '';
+
+function handleUpload(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  uploadedFileName = file.name;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    parsedQuestions = parseQuestions(e.target.result);
+    document.getElementById('file-name').textContent = file.name;
+    document.getElementById('file-ok').textContent = `✓ ${parsedQuestions.length} question(s) parsed`;
+    document.getElementById('file-badge').classList.add('show');
+  };
+  reader.readAsText(file);
+}
+
+function parseQuestions(text) {
+  const qs = [];
+  const blocks = text.trim().split(/\n\s*\n/);
+
+  blocks.forEach(block => {
+    const lines = block.trim().split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length < 3) return;
+
+    // Question line: strip leading number e.g. "1." or "1)"
+    const qLine = lines[0].replace(/^\d+[.)]\s*/, '').trim();
+
+    // Find option lines
+    const getOpt = (letter) => {
+      const pattern = new RegExp(`^${letter}[.)]\\s*`, 'i');
+      const line = lines.find(l => pattern.test(l));
+      return line ? line.replace(pattern, '').trim() : '';
+    };
+
+    const a = getOpt('A'), b = getOpt('B'), c = getOpt('C'), d = getOpt('D');
+
+    // Find ANSWER line
+    const ansLine = lines.find(l => /^ANSWER\s*:/i.test(l)) || '';
+    const answer = ansLine.replace(/^ANSWER\s*:\s*/i, '').trim().toUpperCase().charAt(0);
+
+    if (qLine && a && b && c && d && answer) {
+      qs.push({ question: qLine, a, b, c, d, answer });
+    }
+  });
+
+  return qs;
+}
+
+function saveExam() {
+  DB = loadDB();
+  const subject = document.getElementById('e-subject').value.trim();
+  const cls = document.getElementById('e-class').value;
+  const time = parseInt(document.getElementById('e-time').value);
+  const icon = document.getElementById('e-icon').value.trim() || '📚';
+  const instructions = document.getElementById('e-instructions').value.trim();
+
+  if (!subject || !cls || !time) { toast('⚠️ Subject, class, and time are required.'); return; }
+  if (parsedQuestions.length === 0) { toast('⚠️ Please upload a question file with valid questions.'); return; }
+
+  const exam = {
+    id: Date.now().toString(),
+    subject, studentClass: cls, time, icon, instructions,
+    questions: parsedQuestions,
+    createdAt: new Date().toLocaleString('en-NG')
+  };
+
+  // Replace existing exam for same subject+class
+  const existing = DB.exams.findIndex(e => e.subject === subject && e.studentClass === cls);
+  if (existing >= 0) {
+    if (!confirm(`An exam for "${subject} – ${cls}" already exists. Replace it?`)) return;
+    DB.exams[existing] = exam;
+    logActivity(`Exam updated: ${subject} for ${cls} (${parsedQuestions.length} questions)`);
+  } else {
+    DB.exams.push(exam);
+    logActivity(`Exam created: ${subject} for ${cls} (${parsedQuestions.length} questions)`);
+  }
+
+  saveDB(DB);
+  renderExams();
+  updateSidebarCounts();
+  toast(`✅ "${subject}" for ${cls} is now live — ${parsedQuestions.length} questions.`);
+
+  // Reset form
+  document.getElementById('e-subject').value = '';
+  document.getElementById('e-class').value = '';
+  document.getElementById('e-time').value = '';
+  document.getElementById('e-icon').value = '';
+  document.getElementById('e-instructions').value = '';
+  document.getElementById('q-file').value = '';
+  document.getElementById('file-badge').classList.remove('show');
+  parsedQuestions = [];
+  uploadedFileName = '';
+}
+
+function renderExams() {
+  DB = loadDB();
+  const tbody = document.getElementById('exams-tbody');
+  if (!DB.exams.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No exams configured yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = DB.exams.map(e => `
+    <tr>
+      <td><strong>${e.icon || '📚'} ${e.subject}</strong></td>
+      <td><span class="badge badge-class">${e.studentClass}</span></td>
+      <td>${e.questions.length}</td>
+      <td>${e.time} min</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--soft);font-size:0.82rem" title="${e.instructions || ''}">${e.instructions ? e.instructions.substring(0, 60) + (e.instructions.length > 60 ? '…' : '') : '—'}</td>
+      <td><span class="badge badge-active">● Live</span></td>
+      <td><button class="btn-del" onclick="deleteExam('${e.id}')">Delete</button></td>
+    </tr>
+  `).join('');
+}
+
+function deleteExam(id) {
+  if (!confirm('Delete this exam? Students will no longer see it.')) return;
+  DB = loadDB();
+  const e = DB.exams.find(x => x.id === id);
+  DB.exams = DB.exams.filter(x => x.id !== id);
+  logActivity(`Exam deleted: ${e ? e.subject + ' (' + e.studentClass + ')' : id}`);
+  saveDB(DB);
+  renderExams();
+  updateSidebarCounts();
+  toast('🗑 Exam deleted.');
+}
+
+/* ═══════════════════════════════════
+   RESULTS
+═══════════════════════════════════ */
+function populateSubjectFilter() {
+  DB = loadDB();
+  const sel = document.getElementById('res-filter-subject');
+  const subjects = [...new Set(DB.results.map(r => r.subject))];
+  sel.innerHTML = '<option value="">All Subjects</option>' +
+    subjects.map(s => `<option>${s}</option>`).join('');
+}
+
+function renderResults() {
+  DB = loadDB();
+  const cls = document.getElementById('res-filter-class')?.value || '';
+  const subj = document.getElementById('res-filter-subject')?.value || '';
+
+  let list = [...DB.results].reverse();
+  if (cls) list = list.filter(r => r.class === cls);
+  if (subj) list = list.filter(r => r.subject === subj);
+
+  const tbody = document.getElementById('results-tbody');
+  if (!list.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No results found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(r => {
+    const pctClass = r.pct >= 50 ? 'badge-pass' : 'badge-fail';
+    return `
+      <tr>
+        <td><strong>${r.studentName}</strong></td>
+        <td><span class="badge badge-class">${r.class}</span></td>
+        <td>${r.subject}</td>
+        <td>${r.correct}/${r.total}</td>
+        <td><span class="badge ${pctClass}">${r.pct}%</span></td>
+        <td>${r.timeout ? '<span class="badge badge-timeout">⏰ Timeout</span>' : '<span class="badge badge-active">✓ Submitted</span>'}</td>
+        <td style="font-size:0.78rem;color:var(--soft)">${r.date}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+/* ═══════════════════════════════════
+   CSV EXPORT
+═══════════════════════════════════ */
+function exportCSV() {
+  DB = loadDB();
+  const cls = document.getElementById('res-filter-class')?.value || '';
+  const subj = document.getElementById('res-filter-subject')?.value || '';
+  let list = [...DB.results].reverse();
+  if (cls) list = list.filter(r => r.class === cls);
+  if (subj) list = list.filter(r => r.subject === subj);
+
+  if (!list.length) { toast('No results to export.'); return; }
+
+  const header = 'Student Name,Class,Subject,Correct,Wrong,Skipped,Total,Score (%),Status,Date\n';
+  const rows = list.map(r =>
+    `"${r.studentName}","${r.class}","${r.subject}",${r.correct},${r.wrong || 0},${r.skipped || 0},${r.total},${r.pct}%,"${r.timeout ? 'Timeout' : 'Submitted'}","${r.date}"`
+  ).join('\n');
+
+  const blob = new Blob([header + rows], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cbt-results-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✅ Results exported as CSV.');
+}
+
+/* ═══════════════════════════════════
+   SETTINGS
+═══════════════════════════════════ */
+function loadSettingsFields() {
+  DB = loadDB();
+  document.getElementById('set-school-name').value = DB.schoolName || '';
+  document.getElementById('set-school-loc').value = DB.schoolLocation || '';
+  document.getElementById('set-server-ip').value = DB.settings?.serverIp || '';
+  document.getElementById('set-subnet').value = DB.settings?.subnet || '';
+}
+
+function saveSchoolInfo() {
+  DB = loadDB();
+  const name = document.getElementById('set-school-name').value.trim();
+  const loc = document.getElementById('set-school-loc').value.trim();
+  if (!name) { toast('⚠️ School name cannot be empty.'); return; }
+  DB.schoolName = name;
+  DB.schoolLocation = loc;
+  saveDB(DB);
+  document.getElementById('hero-school-name').textContent = name;
+  document.getElementById('atb-school').textContent = name + ' — Admin Panel';
+  logActivity(`School info updated: ${name}`);
+  toast('✅ School information saved.');
+}
+
+function saveNetworkSettings() {
+  DB = loadDB();
+  DB.settings = DB.settings || {};
+  DB.settings.serverIp = document.getElementById('set-server-ip').value.trim();
+  DB.settings.subnet = document.getElementById('set-subnet').value.trim();
+  saveDB(DB);
+  logActivity('Network/IP settings updated.');
+  toast('✅ Network settings saved.');
+}
+
+function updateAdminCreds() {
+  DB = loadDB();
+  const id = document.getElementById('set-admin-id').value.trim();
+  const pw = document.getElementById('set-admin-pass').value.trim();
+  if (!id || !pw) { toast('⚠️ Both Admin ID and password are required.'); return; }
+  DB.adminId = id; DB.adminPass = pw;
+  saveDB(DB);
+  document.getElementById('set-admin-id').value = '';
+  document.getElementById('set-admin-pass').value = '';
+  logActivity('Admin credentials updated.');
+  toast('✅ Credentials updated. Use new details next login.');
+}
+
+function clearResults() {
+  if (!confirm('Delete ALL exam results? This cannot be undone.')) return;
+  DB = loadDB();
+  DB.results = [];
+  logActivity('All results cleared by admin.');
+  saveDB(DB);
+  renderResults();
+  updateSidebarCounts();
+  toast('🗑 All results cleared.');
+}
+
+function clearAll() {
+  if (!confirm('⚠️ This will reset the ENTIRE portal — all students, exams, and results will be deleted. Are you absolutely sure?')) return;
+  if (!confirm('Last warning — this cannot be undone. Continue?')) return;
+  localStorage.removeItem(STORE);
+  DB = loadDB();
+  saveDB(DB);
+  toast('🗑 Portal reset. Logging out…');
+  setTimeout(() => doLogout(), 1800);
+}
+
+/* ═══════════════════════════════════
+   INIT
+═══════════════════════════════════ */
+(function() {
+  DB = loadDB();
+  if (DB.schoolName) document.getElementById('hero-school-name').textContent = DB.schoolName;
+})();
+</script>
+</body>
+</html>
