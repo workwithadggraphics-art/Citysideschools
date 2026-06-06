@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT Admin Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--g:#059669;--g2:#047857;--g3:#064e3b;--gl:#d1fae5;--gx:#a7f3d0;--glow:rgba(5,150,105,0.15);--ow:#f9f6ef;--ow2:#f0ead8;--cream:#fdfaf3;--ink:#1c2b22;--mid:#3d5a4a;--soft:#7a9a86;--border:rgba(5,150,105,0.18);--cs:0 4px 24px rgba(4,120,87,0.08);--red:#dc2626;--rbg:#fef2f2;--rborder:#fca5a5;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+  .screen{display:none;min-height:100vh;}
+  .screen.active{display:flex;}
+
+  /* LOGIN — full viewport background + centered floating card */
+  #a-login{
+    position:fixed !important;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    overflow-y:auto;
+    padding:20px;
+  }
+  #a-login.active{ display:flex !important; }
+  .login-bg-img{
+    position:fixed;
+    inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    object-position:center top;
+    z-index:0;
+    display:block;
+  }
+  .login-bg-overlay{
+    position:fixed;
+    inset:0;
+    background:linear-gradient(160deg,rgba(3,30,18,0.62),rgba(4,50,28,0.72));
+    z-index:1;
+  }
+  .login-card{
+    position:relative;
+    z-index:10;
+    background:#ffffff;
+    border-radius:22px;
+    padding:40px 38px 36px;
+    width:100%;
+    max-width:390px;
+    box-shadow:0 32px 80px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.1);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin:auto;
+    animation:cardIn .4s cubic-bezier(.34,1.4,.64,1) both;
+  }
+  @keyframes cardIn{
+    from{transform:translateY(32px) scale(.94);opacity:0;}
+    to{transform:translateY(0) scale(1);opacity:1;}
+  }
+  .card-logo{
+    width:88px; height:88px;
+    border-radius:50%;
+    border:3px solid var(--g);
+    background:var(--gl);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    box-shadow:0 4px 24px rgba(5,150,105,.3);
+    margin-bottom:14px;
+    flex-shrink:0;
+  }
+  .card-logo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .logo-fallback{ font-size:2.6rem; line-height:1; }
+  .card-school-name{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.3rem; font-weight:700;
+    color:var(--ink); text-align:center;
+    line-height:1.25; margin-bottom:3px;
+  }
+  .card-location{
+    font-size:.72rem; color:var(--soft);
+    text-transform:uppercase; letter-spacing:.07em;
+    text-align:center;
+  }
+  .card-divider{
+    width:44px; height:2px;
+    background:linear-gradient(to right,transparent,var(--g),transparent);
+    margin:12px auto 18px;
+  }
+  .card-eyebrow{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--gl); border:1px solid var(--gx);
+    border-radius:20px; padding:4px 13px;
+    font-size:.7rem; font-weight:700;
+    color:var(--g2); text-transform:uppercase;
+    letter-spacing:.07em; margin-bottom:18px;
+  }
+  .login-card .form-area{ width:100%; }
+  .field{ margin-bottom:14px; }
+  .field label{
+    display:block; font-size:.7rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.08em;
+    color:var(--mid); margin-bottom:5px;
+  }
+  .fw{ position:relative; }
+  .fi{
+    position:absolute; left:13px; top:50%;
+    transform:translateY(-50%);
+    font-size:.9rem; color:var(--soft);
+    pointer-events:none;
+  }
+  .field input{
+    width:100%; padding:12px 12px 12px 38px;
+    border:1.5px solid var(--border); border-radius:10px;
+    background:#f9f9f9;
+    font-family:'Outfit',sans-serif; font-size:.92rem; color:var(--ink);
+    outline:none; transition:border-color .2s, box-shadow .2s;
+  }
+  .field input:focus{
+    border-color:var(--g);
+    box-shadow:0 0 0 3px var(--glow);
+    background:#fff;
+  }
+  .field input::placeholder{ color:#c0d0c8; }
+  .err-box{
+    display:none; background:#fef2f2;
+    border:1.5px solid #fca5a5; border-radius:9px;
+    padding:9px 13px; font-size:.82rem; color:#991b1b;
+    margin-bottom:14px; width:100%;
+  }
+  .btn-login{
+    width:100%; padding:14px;
+    background:linear-gradient(135deg,var(--g),var(--g3));
+    border:none; border-radius:10px; color:#fff;
+    font-family:'Outfit',sans-serif; font-size:.96rem; font-weight:600;
+    cursor:pointer; letter-spacing:.01em;
+    transition:transform .15s, box-shadow .2s;
+    box-shadow:0 6px 20px rgba(5,150,105,.35);
+    margin-top:4px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn-login:hover{ transform:translateY(-2px); box-shadow:0 10px 28px rgba(5,150,105,.4); }
+  .btn-login:active{ transform:scale(.98); }
+  .btn-login:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+  .spin{
+    width:17px; height:17px;
+    border:2px solid rgba(255,255,255,.35);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:sp .6s linear infinite; display:none;
+  }
+  @keyframes sp{ to{ transform:rotate(360deg) } }
+  .back-link{
+    margin-top:20px; text-align:center;
+    font-size:.76rem; color:var(--soft);
+  }
+  .back-link a{ color:var(--g2); font-weight:600; text-decoration:none; }
+  @media(max-width:440px){
+    .login-card{ padding:30px 20px 26px; }
+  }
+
+  /* SHELL */
+  #a-shell{flex-direction:column;}
+  .admin-topbar{height:64px;background:#fff;border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:90;box-shadow:0 2px 14px rgba(0,0,0,.04);}
+  .atb-left{display:flex;align-items:center;gap:14px;}
+  .atb-logo{width:36px;height:36px;border-radius:50%;border:2px solid var(--g);background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:1rem;overflow:hidden;}
+  .atb-logo img{width:100%;height:100%;object-fit:cover;}
+  .atb-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--g3);font-weight:600;}
+  .atb-right{display:flex;align-items:center;gap:12px;}
+  .admin-chip{display:flex;align-items:center;gap:8px;background:var(--ow);border:1.5px solid var(--border);border-radius:40px;padding:4px 14px 4px 5px;}
+  .admin-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--g3),#022c22);color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .admin-chip span{font-size:.82rem;font-weight:500;color:var(--mid);}
+  .btn-out{padding:7px 16px;border:1.5px solid var(--border);border-radius:8px;background:transparent;color:var(--mid);font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .18s;}
+  .btn-out:hover{border-color:var(--red);color:var(--red);}
+  .admin-body{display:flex;flex:1;min-height:calc(100vh - 64px);}
+  .sidebar{width:228px;background:#fff;border-right:1.5px solid var(--border);padding:22px 12px;display:flex;flex-direction:column;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;}
+  .sb-sec{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--soft);padding:14px 10px 5px;}
+  .sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:.88rem;font-weight:500;color:var(--mid);transition:all .16s;margin-bottom:2px;}
+  .sb-item .ico{font-size:1rem;}
+  .sb-item:hover{background:var(--gl);color:var(--g2);}
+  .sb-item.on{background:var(--gl);color:var(--g2);font-weight:600;}
+  .sb-count{margin-left:auto;background:var(--g2);color:#fff;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:20px;min-width:20px;text-align:center;}
+  .content{flex:1;padding:32px 36px;overflow-y:auto;}
+  .tab-panel{display:none;}
+  .tab-panel.on{display:block;}
+  .sec-header{margin-bottom:26px;}
+  .sec-header h2{font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:var(--ink);margin-bottom:4px;}
+  .sec-header p{font-size:.88rem;color:var(--soft);}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+  .stat-card{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:20px 18px;box-shadow:var(--cs);position:relative;overflow:hidden;}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,var(--g),var(--g2));}
+  .stat-val{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--g2);line-height:1;}
+  .stat-lbl{font-size:.8rem;color:var(--soft);margin-top:4px;}
+  .card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:26px 28px;margin-bottom:20px;box-shadow:var(--cs);}
+  .card h3{font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:18px;}
+  .fg{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+  .fg.one{grid-template-columns:1fr;}
+  .ff label{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mid);margin-bottom:6px;}
+  .ff input,.ff select,.ff textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:9px;background:var(--cream);font-family:'Outfit',sans-serif;font-size:.92rem;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;}
+  .ff input:focus,.ff select:focus,.ff textarea:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--glow);}
+  .ff textarea{resize:vertical;min-height:78px;}
+  .btn-add{padding:11px 22px;background:linear-gradient(135deg,var(--g),var(--g2));border:none;border-radius:9px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .18s;box-shadow:0 4px 12px var(--glow);}
+  .btn-add:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(5,150,105,.28);}
+  .btn-add:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .tbl-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:.87rem;}
+  thead th{text-align:left;padding:9px 13px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--soft);border-bottom:1.5px solid var(--border);white-space:nowrap;}
+  tbody td{padding:12px 13px;border-bottom:1px solid var(--ow2);color:var(--ink);vertical-align:middle;}
+  tbody tr:hover td{background:var(--cream);}
+  .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.73rem;font-weight:600;}
+  .bc{background:var(--gl);color:var(--g2);}
+  .ba{background:var(--gl);color:var(--g2);}
+  .bp{background:#dcfce7;color:#166534;}
+  .bf{background:#fef2f2;color:#991b1b;}
+  .bt{background:#fff7ed;color:#9a3412;}
+  .btn-del{padding:4px 11px;background:var(--rbg);border:1px solid var(--rborder);border-radius:7px;color:var(--red);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s;}
+  .btn-del:hover{background:var(--rborder);}
+  .empty-row td{text-align:center;padding:40px;color:var(--soft);font-size:.9rem;}
+  .upload-zone{border:2px dashed var(--border);border-radius:13px;padding:36px;text-align:center;cursor:pointer;transition:all .2s;background:var(--cream);position:relative;margin-bottom:12px;}
+  .upload-zone:hover{border-color:var(--g);background:var(--gl);}
+  .upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .upload-zone .uz-icon{font-size:2.2rem;margin-bottom:8px;}
+  .upload-zone p{font-size:.85rem;color:var(--soft);line-height:1.7;}
+  .upload-zone strong{color:var(--g2);}
+  .file-badge{display:none;align-items:center;justify-content:space-between;background:var(--gl);border:1.5px solid var(--g);border-radius:10px;padding:12px 16px;margin-bottom:16px;}
+  .file-badge.show{display:flex;}
+  .file-badge .fn{font-weight:600;color:var(--g2);font-size:.88rem;}
+  .file-badge .fok{font-size:.8rem;color:var(--g2);}
+  .fmt-guide{background:#fffbeb;border:1.5px solid #fde68a;border-radius:11px;padding:16px 18px;margin-bottom:16px;}
+  .fmt-guide h4{font-size:.85rem;font-weight:700;color:#78350f;margin-bottom:8px;}
+  .fmt-guide p{font-size:.82rem;color:#92400e;line-height:1.75;}
+  .fmt-guide code{background:#fef3c7;padding:1px 5px;border-radius:4px;font-size:.82em;}
+  .ip{border-radius:12px;padding:16px 18px;margin-bottom:18px;}
+  .ip.blue{background:#eff6ff;border:1.5px solid #bfdbfe;}
+  .ip.blue h4{color:#1e40af;margin-bottom:6px;font-size:.88rem;}
+  .ip.blue p{font-size:.83rem;color:#1e3a8a;line-height:1.7;}
+  .ip.blue code{background:#dbeafe;padding:2px 5px;border-radius:4px;font-size:.85em;}
+  .ip.green{background:#f0fdf4;border:1.5px solid var(--gx);}
+  .ip.green h4{color:var(--g2);margin-bottom:6px;font-size:.88rem;}
+  .ip.green p{font-size:.83rem;color:var(--g3);line-height:1.7;}
+  .ip.green code{background:var(--gl);padding:2px 5px;border-radius:4px;font-size:.85em;}
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:10px;font-size:.88rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .filter-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .filter-row select{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-family:'Outfit',sans-serif;font-size:.85rem;color:var(--ink);outline:none;}
+  .filter-row select:focus{border-color:var(--g);}
+  .filter-lbl{font-size:.8rem;color:var(--soft);font-weight:500;}
+  .activity-list{display:flex;flex-direction:column;gap:10px;}
+  .act-item{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--cream);border-radius:10px;font-size:.87rem;}
+  .act-ico{font-size:1.2rem;flex-shrink:0;}
+  .act-txt{flex:1;color:var(--ink);line-height:1.4;}
+  .act-time{font-size:.75rem;color:var(--soft);}
+  @media(max-width:900px){#a-login{flex-direction:column;}.al-hero{flex:0 0 240px;}.al-panel{width:100%;}.stats-row{grid-template-columns:1fr 1fr;}.fg{grid-template-columns:1fr;}.admin-body{flex-direction:column;}.sidebar{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;padding:12px;border-right:none;border-bottom:1.5px solid var(--border);}.sb-sec{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="screen active" id="a-login">
+  <!-- Full-screen school photo -->
+  <img class="login-bg-img" src="school-image.jpg" alt="School"
+       onerror="this.style.background='linear-gradient(135deg,#064e3b,#022c22)';this.removeAttribute('src')">
+  <!-- Dark overlay -->
+  <div class="login-bg-overlay"></div>
+
+  <!-- Floating card -->
+  <div class="login-card">
+    <!-- Logo centred at top -->
+    <div class="card-logo">
+      <img src="school-logo.png" alt="Logo"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <span class="logo-fallback" style="display:none">🏫</span>
+    </div>
+
+    <div class="card-school-name" id="hero-name">Cityside Secondary School</div>
+    <div class="card-location">Sagamu, Ogun State · Nigeria</div>
+    <div class="card-divider"></div>
+
+    <div class="card-eyebrow">🔐 Admin Portal</div>
+
+    <div class="form-area">
+      <div class="err-box" id="admin-err"></div>
+      <div class="field">
+        <label>Admin ID</label>
+        <div class="fw"><span class="fi">🪪</span>
+          <input type="text" id="a-id" placeholder="Enter Admin ID" autocomplete="off">
+        </div>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="fw"><span class="fi">🔑</span>
+          <input type="password" id="a-pass" placeholder="Enter password">
+        </div>
+      </div>
+      <button class="btn-login" id="login-btn" onclick="doLogin()">
+        <span id="login-txt">Access Admin Panel →</span>
+        <div class="spin" id="login-spin"></div>
+      </button>
+    </div>
+
+    <div class="back-link">Student portal? <a href="student.html">Go to Student Login →</a></div>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div class="screen" id="a-shell">
+  <div class="admin-topbar">
+    <div class="atb-left">
+      <div class="atb-logo"><img src="school-logo.png" alt="" onerror="this.outerHTML='🏫'"></div>
+      <span class="atb-title" id="atb-title">CBT Admin Panel</span>
+    </div>
+    <div class="atb-right">
+      <div class="admin-chip"><div class="admin-av">A</div><span>Administrator</span></div>
+      <button class="btn-out" onclick="doLogout()">Log Out</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+    <div class="sidebar">
+      <div class="sb-sec">Overview</div>
+      <div class="sb-item on" onclick="go('overview')" data-tab="overview"><span class="ico">📊</span> Dashboard</div>
+      <div class="sb-sec">Management</div>
+      <div class="sb-item" onclick="go('students')" data-tab="students"><span class="ico">👨‍🎓</span> Students <span class="sb-count" id="sb-s">0</span></div>
+      <div class="sb-item" onclick="go('questions')" data-tab="questions"><span class="ico">📋</span> Exams &amp; Questions <span class="sb-count" id="sb-e">0</span></div>
+      <div class="sb-sec">Reports</div>
+      <div class="sb-item" onclick="go('results')" data-tab="results"><span class="ico">📈</span> Results <span class="sb-count" id="sb-r">0</span></div>
+      <div class="sb-sec">System</div>
+      <div class="sb-item" onclick="go('settings')" data-tab="settings"><span class="ico">⚙️</span> Settings</div>
+    </div>
+
+    <div class="content">
+
+      <!-- OVERVIEW -->
+      <div class="tab-panel on" id="tab-overview">
+        <div class="sec-header"><h2>Dashboard</h2><p>Portal activity at a glance.</p></div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-val" id="ov-s">0</div><div class="stat-lbl">Students</div></div>
+          <div class="stat-card"><div class="stat-val" id="ov-e">0</div><div class="stat-lbl">Exams Configured</div></div>
+          <div class="stat-card"><div class="stat-val" id="ov-r">0</div><div class="stat-lbl">Results Recorded</div></div>
+          <div class="stat-card"><div class="stat-val" id="ov-sub">0</div><div class="stat-lbl">Subjects</div></div>
+        </div>
+        <div class="card"><h3>📋 Recent Activity</h3><div class="activity-list" id="act-list"><div style="color:var(--soft);font-size:.88rem">No activity yet.</div></div></div>
+      </div>
+
+      <!-- STUDENTS -->
+      <div class="tab-panel" id="tab-students">
+        <div class="sec-header"><h2>Student Management</h2><p>Students log in with Surname + Admission Number.</p></div>
+        <div class="card">
+          <h3>➕ Add Student</h3>
+          <div class="fg">
+            <div class="ff"><label>Surname (Username)</label><input type="text" id="s-surname" placeholder="e.g. Adeyemi"></div>
+            <div class="ff"><label>First Name</label><input type="text" id="s-firstname" placeholder="e.g. Toluwani"></div>
+          </div>
+          <div class="fg">
+            <div class="ff"><label>Admission Number (Password)</label><input type="text" id="s-admno" placeholder="e.g. CSS/2025/001"></div>
+            <div class="ff"><label>Class</label>
+              <select id="s-class">
+                <option value="">— Select Class —</option>
+                <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+                <option>SSS 1</option><option>SSS 2</option><option>SSS 3</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-add" id="add-s-btn" onclick="addStudent()">+ Add Student</button>
+        </div>
+        <div class="card">
+          <h3>👨‍🎓 Student List</h3>
+          <div class="filter-row">
+            <span class="filter-lbl">Filter:</span>
+            <select id="filter-class" onchange="loadStudents()">
+              <option value="">All Classes</option>
+              <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+              <option>SSS 1</option><option>SSS 2</option><option>SSS 3</option>
+            </select>
+          </div>
+          <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Surname</th><th>First Name</th><th>Admission No.</th><th>Class</th><th>Action</th></tr></thead><tbody id="students-tb"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- QUESTIONS -->
+      <div class="tab-panel" id="tab-questions">
+        <div class="sec-header"><h2>Exams &amp; Questions</h2><p>Upload questions and configure exams. Goes live immediately.</p></div>
+        <div class="fmt-guide">
+          <h4>📄 Question File Format (.txt)</h4>
+          <p>Separate each question with a blank line:<br>
+          <code>1. What is the capital of Nigeria?</code><br>
+          <code>A. Lagos</code> &nbsp; <code>B. Abuja</code> &nbsp; <code>C. Kano</code> &nbsp; <code>D. Ibadan</code><br>
+          <code>ANSWER: B</code><br><br>
+          The <code>ANSWER:</code> line is stored securely on the server — students never see it.</p>
+        </div>
+        <div class="card">
+          <h3>⚙️ Configure New Exam</h3>
+          <div class="fg">
+            <div class="ff"><label>Subject</label><input type="text" id="e-subject" placeholder="e.g. Mathematics"></div>
+            <div class="ff"><label>Class</label>
+              <select id="e-class">
+                <option value="">— Select Class —</option>
+                <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+                <option>SSS 1</option><option>SSS 2</option><option>SSS 3</option>
+              </select>
+            </div>
+          </div>
+          <div class="fg">
+            <div class="ff"><label>Time (minutes)</label><input type="number" id="e-time" placeholder="e.g. 60" min="5" max="180"></div>
+            <div class="ff"><label>Icon (emoji)</label><input type="text" id="e-icon" placeholder="e.g. 📐" maxlength="2"></div>
+          </div>
+          <div class="fg one" style="margin-bottom:16px">
+            <div class="ff"><label>Instructions (shown to students before start)</label><textarea id="e-instr" placeholder="e.g. Answer all 40 questions. Each carries 1 mark."></textarea></div>
+          </div>
+          <div class="ff" style="margin-bottom:8px"><label>Upload Question File (.txt)</label></div>
+          <div class="upload-zone">
+            <input type="file" id="q-file" accept=".txt,.docx,.doc" onchange="handleFile(event)">
+            <div class="uz-icon">📄</div>
+            <p><strong>Click to upload</strong> or drag & drop</p>
+            <p>Accepted: .txt files formatted as shown above</p>
+          </div>
+          <div class="file-badge" id="file-badge"><span class="fn" id="file-name">file.txt</span><span class="fok" id="file-ok">✓ 0 questions</span></div>
+          <button class="btn-add" id="save-exam-btn" onclick="saveExam()">💾 Save &amp; Go Live</button>
+        </div>
+        <div class="card">
+          <h3>📋 Configured Exams</h3>
+          <div class="tbl-wrap"><table><thead><tr><th>Subject</th><th>Class</th><th>Questions</th><th>Time</th><th>Status</th><th>Action</th></tr></thead><tbody id="exams-tb"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="tab-panel" id="tab-results">
+        <div class="sec-header"><h2>Exam Results</h2><p>All submitted results across all classes.</p></div>
+        <div class="card">
+          <h3>📈 All Results</h3>
+          <div class="filter-row">
+            <span class="filter-lbl">Filter:</span>
+            <select id="r-filter-class" onchange="loadResults()"><option value="">All Classes</option><option>JSS 1</option><option>JSS 2</option><option>JSS 3</option><option>SSS 1</option><option>SSS 2</option><option>SSS 3</option></select>
+            <select id="r-filter-subject" onchange="loadResults()"><option value="">All Subjects</option></select>
+            <button class="btn-add" style="padding:7px 14px;font-size:.8rem" onclick="exportCSV()">⬇ Export CSV</button>
+          </div>
+          <div class="tbl-wrap"><table><thead><tr><th>Student</th><th>Class</th><th>Subject</th><th>Score</th><th>%</th><th>Status</th><th>Date</th></tr></thead><tbody id="results-tb"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="tab-panel" id="tab-settings">
+        <div class="sec-header"><h2>Settings</h2><p>Portal configuration and credentials.</p></div>
+        <div class="ip blue">
+          <h4>🔒 IP Restriction — Active via Server</h4>
+          <p>Because the portal is served from your phone via Node.js on Termux, IP restriction is already active. Only devices on the same Wi-Fi/LAN as your phone can reach <code>http://&lt;your-phone-ip&gt;:3000</code>. Students at home cannot access it — their devices cannot reach your phone's local IP over the internet.</p>
+        </div>
+        <div class="card">
+          <h3>🏫 School Information</h3>
+          <div class="fg">
+            <div class="ff"><label>School Name</label><input type="text" id="set-name" placeholder="School name"></div>
+            <div class="ff"><label>Location</label><input type="text" id="set-loc" placeholder="e.g. Sagamu, Ogun State"></div>
+          </div>
+          <button class="btn-add" onclick="saveSchool()">💾 Save</button>
+        </div>
+        <div class="card">
+          <h3>🔑 Update Admin Credentials</h3>
+          <div class="fg">
+            <div class="ff"><label>New Admin ID</label><input type="text" id="set-aid" placeholder="New Admin ID"></div>
+            <div class="ff"><label>New Password</label><input type="password" id="set-apass" placeholder="New password"></div>
+          </div>
+          <button class="btn-add" onclick="updateCreds()">🔑 Update</button>
+        </div>
+        <div class="card">
+          <h3>⚠️ Danger Zone</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn-del" style="padding:9px 18px;font-size:.85rem" onclick="clearResults()">🗑 Clear All Results</button>
+            <button class="btn-del" style="padding:9px 18px;font-size:.85rem" onclick="resetPortal()">🗑 Reset Entire Portal</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* API helper */
+async function api(path, opts = {}) {
+  const r = await fetch(path, { headers: {'Content-Type':'application/json'}, ...opts });
+  return r.json();
+}
+
+/* Toast */
+function toast(msg, d = 2800) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), d);
+}
+
+/* Screen */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* Parsed questions buffer */
+let parsedQs = [];
+
+/* ── LOGIN ── */
+async function doLogin() {
+  const adminId = document.getElementById('a-id').value.trim();
+  const adminPass = document.getElementById('a-pass').value.trim();
+  const err = document.getElementById('admin-err');
+  const btn = document.getElementById('login-btn');
+  const spin = document.getElementById('login-spin');
+  const txt = document.getElementById('login-txt');
+  err.style.display = 'none';
+
+  if (!adminId || !adminPass) { err.textContent = 'Enter Admin ID and password.'; err.style.display = 'block'; return; }
+
+  btn.disabled = true; spin.style.display = 'block'; txt.textContent = 'Signing in…';
+
+  try {
+    const data = await api('/api/admin/login', { method:'POST', body: JSON.stringify({ adminId, adminPass }) });
+    if (!data.ok) { err.textContent = data.error || 'Login failed.'; err.style.display = 'block'; }
+    else { await loadAll(); show('a-shell'); }
+  } catch { err.textContent = 'Cannot reach server.'; err.style.display = 'block'; }
+  finally { btn.disabled = false; spin.style.display = 'none'; txt.textContent = 'Access Admin Panel →'; }
+}
+
+function doLogout() {
+  document.getElementById('a-id').value = '';
+  document.getElementById('a-pass').value = '';
+  show('a-login');
+}
+
+/* ── TAB ── */
+function go(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
+  document.getElementById(`tab-${tab}`).classList.add('on');
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.toggle('on', i.dataset.tab === tab));
+  if (tab === 'overview') loadOverview();
+  if (tab === 'students') loadStudents();
+  if (tab === 'questions') loadExams();
+  if (tab === 'results') { loadResults(); populateSubjectFilter(); }
+  if (tab === 'settings') loadSettings();
+}
+
+async function loadAll() {
+  await loadOverview();
+  await loadStudents();
+  await loadExams();
+  await loadResults();
+  await populateSubjectFilter();
+}
+
+/* ── OVERVIEW ── */
+async function loadOverview() {
+  try {
+    const d = await api('/api/admin/overview');
+    document.getElementById('ov-s').textContent   = d.studentCount;
+    document.getElementById('ov-e').textContent   = d.examCount;
+    document.getElementById('ov-r').textContent   = d.resultCount;
+    document.getElementById('ov-sub').textContent = d.subjectCount;
+    document.getElementById('sb-s').textContent   = d.studentCount;
+    document.getElementById('sb-e').textContent   = d.examCount;
+    document.getElementById('sb-r').textContent   = d.resultCount;
+
+    const list = document.getElementById('act-list');
+    const acts = d.activity || [];
+    if (!acts.length) { list.innerHTML = '<div style="color:var(--soft);font-size:.88rem">No activity yet.</div>'; return; }
+    list.innerHTML = acts.map(a => `
+      <div class="act-item"><div class="act-ico">📌</div><div class="act-txt">${a.msg}</div><div class="act-time">${a.time}</div></div>
+    `).join('');
+  } catch { toast('⚠️ Could not load overview.'); }
+}
+
+/* ── STUDENTS ── */
+async function loadStudents() {
+  try {
+    const d = await api('/api/admin/students');
+    const filter = document.getElementById('filter-class')?.value || '';
+    const list = filter ? d.students.filter(s => s.class === filter) : d.students;
+    const tb = document.getElementById('students-tb');
+
+    if (!list.length) { tb.innerHTML = `<tr class="empty-row"><td colspan="6">No students found.</td></tr>`; return; }
+    tb.innerHTML = list.map((s, i) => `
+      <tr>
+        <td style="color:var(--soft)">${i+1}</td>
+        <td><strong>${s.surname}</strong></td>
+        <td>${s.firstName}</td>
+        <td><code style="background:var(--cream);padding:2px 7px;border-radius:5px;font-size:.82em">${s.admNo}</code></td>
+        <td><span class="badge bc">${s.class}</span></td>
+        <td><button class="btn-del" onclick="delStudent('${s.id}')">Delete</button></td>
+      </tr>
+    `).join('');
+  } catch { toast('⚠️ Could not load students.'); }
+}
+
+async function addStudent() {
+  const surname    = document.getElementById('s-surname').value.trim();
+  const firstName  = document.getElementById('s-firstname').value.trim();
+  const admNo      = document.getElementById('s-admno').value.trim();
+  const studentClass = document.getElementById('s-class').value;
+  if (!surname || !firstName || !admNo || !studentClass) { toast('⚠️ Fill all student fields.'); return; }
+
+  const btn = document.getElementById('add-s-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+    const d = await api('/api/admin/students', { method:'POST', body: JSON.stringify({ surname, firstName, admNo, studentClass }) });
+    if (!d.ok) { toast(`⚠️ ${d.error}`); }
+    else {
+      toast(`✅ ${firstName} ${surname} added to ${studentClass}`);
+      document.getElementById('s-surname').value = '';
+      document.getElementById('s-firstname').value = '';
+      document.getElementById('s-admno').value = '';
+      document.getElementById('s-class').value = '';
+      await loadStudents();
+      await loadOverview();
+    }
+  } catch { toast('⚠️ Network error.'); }
+  finally { btn.disabled = false; btn.textContent = '+ Add Student'; }
+}
+
+async function delStudent(id) {
+  if (!confirm('Delete this student?')) return;
+  try {
+    await api(`/api/admin/students/${id}`, { method:'DELETE' });
+    toast('🗑 Student deleted.');
+    await loadStudents();
+    await loadOverview();
+  } catch { toast('⚠️ Error.'); }
+}
+
+/* ── EXAMS ── */
+function handleFile(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    parsedQs = parseQs(e.target.result);
+    document.getElementById('file-name').textContent = file.name;
+    document.getElementById('file-ok').textContent = `✓ ${parsedQs.length} questions parsed`;
+    document.getElementById('file-badge').classList.add('show');
+  };
+  reader.readAsText(file);
+}
+
+function parseQs(text) {
+  const qs = [];
+  text.trim().split(/\n\s*\n/).forEach(block => {
+    const lines = block.trim().split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length < 3) return;
+    const qLine = lines[0].replace(/^\d+[.)]\s*/, '').trim();
+    const get = lt => { const l = lines.find(x => new RegExp(`^${lt}[.)]\\s*`,'i').test(x)); return l ? l.replace(new RegExp(`^${lt}[.)]\\s*`,'i'),'').trim() : ''; };
+    const a = get('A'), b = get('B'), c = get('C'), d = get('D');
+    const al = lines.find(l => /^ANSWER\s*:/i.test(l)) || '';
+    const answer = al.replace(/^ANSWER\s*:\s*/i,'').trim().toUpperCase().charAt(0);
+    if (qLine && a && b && c && d && answer) qs.push({ question: qLine, a, b, c, d, answer });
+  });
+  return qs;
+}
+
+async function saveExam() {
+  const subject = document.getElementById('e-subject').value.trim();
+  const studentClass = document.getElementById('e-class').value;
+  const time = document.getElementById('e-time').value;
+  const icon = document.getElementById('e-icon').value.trim() || '📚';
+  const instructions = document.getElementById('e-instr').value.trim();
+
+  if (!subject || !studentClass || !time) { toast('⚠️ Subject, class and time are required.'); return; }
+  if (!parsedQs.length) { toast('⚠️ Upload a question file first.'); return; }
+
+  const btn = document.getElementById('save-exam-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+    const d = await api('/api/admin/exams', {
+      method: 'POST',
+      body: JSON.stringify({ subject, studentClass, time, icon, instructions, questions: parsedQs })
+    });
+
+    if (!d.ok) { toast(`⚠️ ${d.error}`); }
+    else {
+      toast(`✅ "${subject}" for ${studentClass} is live — ${parsedQs.length} questions.`);
+      document.getElementById('e-subject').value = '';
+      document.getElementById('e-class').value = '';
+      document.getElementById('e-time').value = '';
+      document.getElementById('e-icon').value = '';
+      document.getElementById('e-instr').value = '';
+      document.getElementById('q-file').value = '';
+      document.getElementById('file-badge').classList.remove('show');
+      parsedQs = [];
+      await loadExams();
+      await loadOverview();
+    }
+  } catch { toast('⚠️ Network error.'); }
+  finally { btn.disabled = false; btn.textContent = '💾 Save & Go Live'; }
+}
+
+async function loadExams() {
+  try {
+    const d = await api('/api/admin/exams');
+    const tb = document.getElementById('exams-tb');
+    if (!d.exams.length) { tb.innerHTML = `<tr class="empty-row"><td colspan="6">No exams yet.</td></tr>`; return; }
+    tb.innerHTML = d.exams.map(e => `
+      <tr>
+        <td><strong>${e.icon || '📚'} ${e.subject}</strong></td>
+        <td><span class="badge bc">${e.studentClass}</span></td>
+        <td>${e.questions.length}</td>
+        <td>${e.time} min</td>
+        <td><span class="badge ba">● Live</span></td>
+        <td><button class="btn-del" onclick="delExam('${e.id}')">Delete</button></td>
+      </tr>
+    `).join('');
+  } catch { toast('⚠️ Could not load exams.'); }
+}
+
+async function delExam(id) {
+  if (!confirm('Delete this exam?')) return;
+  try {
+    await api(`/api/admin/exams/${id}`, { method:'DELETE' });
+    toast('🗑 Exam deleted.');
+    await loadExams(); await loadOverview();
+  } catch { toast('⚠️ Error.'); }
+}
+
+/* ── RESULTS ── */
+async function populateSubjectFilter() {
+  try {
+    const d = await api('/api/admin/results');
+    const subjects = [...new Set(d.results.map(r => r.subject))];
+    const sel = document.getElementById('r-filter-subject');
+    sel.innerHTML = '<option value="">All Subjects</option>' + subjects.map(s => `<option>${s}</option>`).join('');
+  } catch {}
+}
+
+async function loadResults() {
+  try {
+    const cls  = document.getElementById('r-filter-class')?.value || '';
+    const subj = document.getElementById('r-filter-subject')?.value || '';
+    let url = '/api/admin/results?';
+    if (cls)  url += `class=${encodeURIComponent(cls)}&`;
+    if (subj) url += `subject=${encodeURIComponent(subj)}&`;
+    const d = await api(url);
+    const tb = document.getElementById('results-tb');
+
+    if (!d.results.length) { tb.innerHTML = `<tr class="empty-row"><td colspan="7">No results found.</td></tr>`; return; }
+
+    tb.innerHTML = d.results.map(r => `
+      <tr>
+        <td><strong>${r.studentName}</strong></td>
+        <td><span class="badge bc">${r.class}</span></td>
+        <td>${r.subject}</td>
+        <td>${r.correct}/${r.total}</td>
+        <td><span class="badge ${r.pct >= 50 ? 'bp' : 'bf'}">${r.pct}%</span></td>
+        <td>${r.timeout ? '<span class="badge bt">⏰ Timeout</span>' : '<span class="badge ba">✓ Submitted</span>'}</td>
+        <td style="font-size:.78rem;color:var(--soft)">${r.date}</td>
+      </tr>
+    `).join('');
+  } catch { toast('⚠️ Could not load results.'); }
+}
+
+async function exportCSV() {
+  try {
+    const cls  = document.getElementById('r-filter-class')?.value || '';
+    const subj = document.getElementById('r-filter-subject')?.value || '';
+    let url = '/api/admin/results?';
+    if (cls)  url += `class=${encodeURIComponent(cls)}&`;
+    if (subj) url += `subject=${encodeURIComponent(subj)}&`;
+    const d = await api(url);
+    if (!d.results.length) { toast('No results to export.'); return; }
+
+    const header = 'Student,Class,Subject,Correct,Wrong,Skipped,Total,Score(%),Status,Date\n';
+    const rows = d.results.map(r =>
+      `"${r.studentName}","${r.class}","${r.subject}",${r.correct},${r.wrong||0},${r.skipped||0},${r.total},${r.pct}%,"${r.timeout?'Timeout':'Submitted'}","${r.date}"`
+    ).join('\n');
+
+    const blob = new Blob([header + rows], { type:'text/csv' });
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `results-${Date.now()}.csv` });
+    a.click(); URL.revokeObjectURL(a.href);
+    toast('✅ CSV exported.');
+  } catch { toast('⚠️ Export failed.'); }
+}
+
+/* ── SETTINGS ── */
+async function loadSettings() {
+  try {
+    const d = await api('/api/admin/settings');
+    document.getElementById('set-name').value = d.schoolName || '';
+    document.getElementById('set-loc').value  = d.schoolLocation || '';
+  } catch {}
+}
+
+async function saveSchool() {
+  const schoolName = document.getElementById('set-name').value.trim();
+  const schoolLocation = document.getElementById('set-loc').value.trim();
+  if (!schoolName) { toast('⚠️ School name required.'); return; }
+  try {
+    await api('/api/admin/settings', { method:'POST', body: JSON.stringify({ schoolName, schoolLocation }) });
+    document.getElementById('hero-name').textContent = schoolName;
+    document.getElementById('atb-title').textContent = schoolName + ' — Admin Panel';
+    toast('✅ School info saved.');
+  } catch { toast('⚠️ Error.'); }
+}
+
+async function updateCreds() {
+  const adminId   = document.getElementById('set-aid').value.trim();
+  const adminPass = document.getElementById('set-apass').value.trim();
+  if (!adminId || !adminPass) { toast('⚠️ Both fields required.'); return; }
+  try {
+    const d = await api('/api/admin/credentials', { method:'POST', body: JSON.stringify({ adminId, adminPass }) });
+    if (!d.ok) { toast(`⚠️ ${d.error}`); return; }
+    document.getElementById('set-aid').value = '';
+    document.getElementById('set-apass').value = '';
+    toast('✅ Credentials updated. Use new details next login.');
+  } catch { toast('⚠️ Error.'); }
+}
+
+async function clearResults() {
+  if (!confirm('Delete ALL results?')) return;
+  try { await api('/api/admin/results', { method:'DELETE' }); toast('🗑 Results cleared.'); await loadResults(); await loadOverview(); }
+  catch { toast('⚠️ Error.'); }
+}
+
+async function resetPortal() {
+  if (!confirm('Reset the entire portal? All data will be lost.')) return;
+  if (!confirm('Last warning. Continue?')) return;
+  try { await api('/api/admin/reset', { method:'DELETE' }); toast('🗑 Portal reset. Logging out…'); setTimeout(doLogout, 1800); }
+  catch { toast('⚠️ Error.'); }
+}
+
+/* ── INIT ── */
+(async function() {
+  try {
+    const d = await api('/api/school');
+    if (d.ok && d.schoolName) document.getElementById('hero-name').textContent = d.schoolName;
+  } catch {}
+})();
+</script>
+</body>
+</html>
