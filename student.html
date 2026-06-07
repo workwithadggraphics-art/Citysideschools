@@ -640,6 +640,14 @@ function closeConfirm() {
   pendingExam = null;
 }
 
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 /* ═══════════════ EXAM ENGINE ═══════════════ */
 async function beginExam() {
   const btn = document.getElementById('btn-start');
@@ -654,6 +662,8 @@ async function beginExam() {
   }
 
   currentExam = data.exam;
+currentExam = data.exam;
+currentExam.questions = shuffleArray(currentExam.questions);
   closeConfirm();
   qIdx = 0; answers = {}; timedOut = false;
 
@@ -697,7 +707,7 @@ if (q.type === 'fill') {
       <input type="text" id="fill-input" value="${(sel || '').replace(/"/g, '&quot;')}"
         placeholder="Type your answer here…"
         style="width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:12px;font-family:'Outfit',sans-serif;font-size:1rem;outline:none;transition:border-color .2s;background:#f9f9f9"
-        oninput="pickAnswer(this.value)"
+        oninput="answers[qIdx]=this.value"
         onfocus="this.style.borderColor='var(--g)'"
         onblur="this.style.borderColor='var(--border)'">
     </div>`;
