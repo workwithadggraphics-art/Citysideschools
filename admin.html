@@ -868,7 +868,10 @@ function parseQs(text) {
     const typeLine = lines.find(l => /^TYPE\s*:/i.test(l)) || '';
 const qType = typeLine.replace(/^TYPE\s*:\s*/i, '').trim().toLowerCase();
 
-if (qType === 'fill') {
+// Auto-detect fill in blank if no options found OR TYPE: FILL declared
+const isFill = qType === 'fill' || (!a && !b && !c && !d);
+
+if (isFill) {
   if (qLine && answer) qs.push({ question: qLine, type: 'fill', answer });
 } else {
   if (qLine && a && b && c && d && answer) qs.push({ question: qLine, type: 'mcq', a, b, c, d, answer });
