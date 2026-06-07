@@ -697,7 +697,7 @@ if (q.image) {
   qEl.appendChild(img);
 }
 
-  const sel = answers[qIdx];
+  const sel = answers[currentExam.questions[qIdx].question];
 if (q.type === 'fill') {
   document.getElementById('options').innerHTML = `
     <div style="grid-column:1/-1;padding:4px 0">
@@ -738,7 +738,7 @@ function refreshNavGrid() {
   currentExam.questions.forEach((_, i) => {
     const b = document.getElementById('qgb-' + i);
     if (!b) return;
-    b.className = 'qg-btn' + (i === qIdx ? ' now' : answers[i] ? ' done' : '');
+    b.className = 'qg-btn' + (i === qIdx ? ' now' : answers[q.question] ? ' done' : '');
   });
 }
 
@@ -774,6 +774,13 @@ function trySubmit() {
 async function finalSubmit() {
   clearInterval(timerInt);
 
+  const serverAnswers = {};
+  currentExam.questions.forEach((q) => {
+    if (answers[q.question] !== undefined) {
+      serverAnswers[q.originalIndex] = answers[q.question];
+    }
+  });
+
   const data = await api('/api/result', {
     method: 'POST',
     body:   JSON.stringify({
@@ -781,7 +788,7 @@ async function finalSubmit() {
       studentName:  currentStudent.firstName + ' ' + currentStudent.surname,
       studentClass: currentStudent.class,
       examId:       currentExam.id,
-      answers,
+      answers:      serverAnswers,
       timeout:      timedOut
     })
   });
@@ -793,7 +800,6 @@ async function finalSubmit() {
 
   const r = data.result;
 
-  // Move this exam to takenList in memory
   const idx = examList.findIndex(e => e.id === currentExam.id);
   if (idx >= 0) {
     const taken = { ...examList[idx], taken: true, pct: r.pct };
@@ -801,7 +807,6 @@ async function finalSubmit() {
     examList.splice(idx, 1);
   }
 
-  // Render result screen
   document.getElementById('r-emoji').textContent   = r.pct >= 70 ? '🎉' : r.pct >= 50 ? '👍' : '📚';
   document.getElementById('r-heading').textContent = r.pct >= 70 ? 'Excellent Work!' : r.pct >= 50 ? 'Good Effort!' : 'Keep Pushing!';
   document.getElementById('r-sub').textContent     = currentStudent.firstName + ', here are your results for ' + r.subject + '.';
