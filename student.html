@@ -663,6 +663,7 @@ async function beginExam() {
 
   currentExam = data.exam;
 currentExam = data.exam;
+currentExam.questions = currentExam.questions.map((q, i) => ({ ...q, originalIndex: i }));
 currentExam.questions = shuffleArray(currentExam.questions);
   closeConfirm();
   qIdx = 0; answers = {}; timedOut = false;
@@ -723,7 +724,10 @@ if (q.type === 'fill') {
   refreshNavGrid();
 }
 
-function pickAnswer(k)  { answers[qIdx] = k; renderQ(); }
+function pickAnswer(k) {
+  answers[currentExam.questions[qIdx].question] = k;
+  refreshNavGrid();
+}
 function nextQ()        { if (qIdx < currentExam.questions.length - 1) { qIdx++; renderQ(); } }
 function prevQ()        { if (qIdx > 0) { qIdx--; renderQ(); } }
 function jumpQ(i)       { qIdx = i; renderQ(); }
