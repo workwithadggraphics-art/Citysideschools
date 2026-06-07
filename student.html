@@ -676,15 +676,40 @@ function renderQ() {
   document.getElementById('q-counter').textContent = 'Question ' + (qIdx + 1) + ' of ' + total;
   document.getElementById('q-badge').textContent   = 'Q ' + (qIdx + 1);
   document.getElementById('q-prog').style.width    = ((qIdx + 1) / total * 100) + '%';
-  document.getElementById('q-text').textContent    = q.question;
+  const qEl = document.getElementById('q-text');
+qEl.innerHTML = '';
+const textNode = document.createElement('div');
+textNode.textContent = q.question;
+qEl.appendChild(textNode);
+if (q.image) {
+  const img = document.createElement('img');
+  img.src = q.image;
+  img.style.cssText = 'max-width:100%;max-height:220px;margin-top:12px;border-radius:10px;object-fit:contain;display:block';
+  qEl.appendChild(img);
+}
 
   const sel = answers[qIdx];
+if (q.type === 'fill') {
+  document.getElementById('options').innerHTML = `
+    <div style="grid-column:1/-1;padding:4px 0">
+      <label style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--soft);display:block;margin-bottom:8px">
+        Write your answer below
+      </label>
+      <input type="text" id="fill-input" value="${(sel || '').replace(/"/g, '&quot;')}"
+        placeholder="Type your answer here…"
+        style="width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:12px;font-family:'Outfit',sans-serif;font-size:1rem;outline:none;transition:border-color .2s;background:#f9f9f9"
+        oninput="pickAnswer(this.value)"
+        onfocus="this.style.borderColor='var(--g)'"
+        onblur="this.style.borderColor='var(--border)'">
+    </div>`;
+} else {
   document.getElementById('options').innerHTML = [['A',q.a],['B',q.b],['C',q.c],['D',q.d]].map(([k,txt]) => `
     <button class="opt ${sel === k ? 'picked' : ''}" onclick="pickAnswer('${k}')">
       <div class="opt-key">${k}</div>
       <div class="opt-text">${txt}</div>
     </button>
   `).join('');
+}
 
   refreshNavGrid();
 }
