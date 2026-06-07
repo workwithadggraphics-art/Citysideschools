@@ -330,7 +330,6 @@
       </button>
     </div>
 
-    <div class="login-footer">Admin? <a href="admin.html">Go to Admin Portal →</a></div>
   </div>
 </div>
 
@@ -471,7 +470,7 @@
    Example: 'https://cbt-portal.onrender.com'
    Leave empty ('') only when running locally (server serves both files).
 ═══════════════════════════════════════════════════════ */
-const API_URL = '';  // ← PASTE YOUR RENDER BACKEND URL HERE
+const API_URL = 'https://cbt-backend-xykl.onrender.com';  // ← PASTE YOUR RENDER BACKEND URL HERE
 
 async function api(path, opts = {}) {
   const base = API_URL || window.location.origin;
