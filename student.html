@@ -352,13 +352,18 @@
     </div>
   </div>
   <div class="dash-body">
-    <div class="dash-welcome">
-      <div>
-        <h1>Welcome, <span id="greet-name">Student</span></h1>
-        <p>Select a subject to begin. Make sure you are ready before starting.</p>
-      </div>
-      <div class="dash-date" id="dash-date"></div>
+    <<div class="dash-welcome">
+  <div style="display:flex;align-items:center;gap:16px">
+    <div id="student-avatar-wrap"
+      style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--g),var(--g3));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:700;flex-shrink:0;border:3px solid var(--g);box-shadow:0 4px 16px var(--glow)">
     </div>
+    <div>
+      <h1>Welcome, <span id="greet-name">Student</span></h1>
+      <p>Select a subject below to begin your examination.</p>
+    </div>
+  </div>
+  <div class="dash-date" id="dash-date"></div>
+</div>
     <div class="subjects-heading">Available Examinations</div>
     <div class="subjects-grid" id="subjects-grid"></div>
 
