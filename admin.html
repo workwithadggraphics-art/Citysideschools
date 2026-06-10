@@ -364,14 +364,18 @@
       📷 Use Camera
     </button>
   </div>
-  <input type="file" id="s-photo-gallery" accept="image/*" style="display:none" onchange="previewStudentPhoto(event)">
-  <input type="file" id="s-photo-camera" accept="image/*" capture="user" style="display:none" onchange="previewStudentPhoto(event)">
+  <input type="file" id="s-photo-gallery" accept="image/*" style="display:none" onchange="uploadStudentPhoto(event)">
+  <input type="file" id="s-photo-camera" accept="image/*" capture="user" style="display:none" onchange="uploadStudentPhoto(event)">
+  <div id="s-photo-uploading" style="display:none;align-items:center;gap:10px;padding:12px;background:var(--cream);border:1.5px solid var(--border);border-radius:10px">
+    <div style="width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--g);border-radius:50%;animation:sp .6s linear infinite;flex-shrink:0"></div>
+    <span style="font-size:.85rem;color:var(--soft)">Uploading photo…</span>
+  </div>
   <div id="s-photo-preview-wrap" style="display:none;align-items:center;gap:12px;background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:12px">
     <img id="s-photo-preview" src="" alt="Preview"
       style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--g)">
     <div style="flex:1">
-      <div id="s-photo-name" style="font-size:.85rem;font-weight:600;color:var(--ink)">photo.jpg</div>
-      <div style="font-size:.75rem;color:var(--soft)">Photo ready</div>
+      <div style="font-size:.85rem;font-weight:600;color:var(--ink)">Photo uploaded</div>
+      <div style="font-size:.75rem;color:var(--soft)">Ready to save</div>
     </div>
     <button type="button" onclick="clearStudentPhoto()"
       style="padding:5px 12px;border:1px solid var(--rborder);border-radius:7px;background:var(--rbg);color:var(--red);font-size:.78rem;cursor:pointer">
