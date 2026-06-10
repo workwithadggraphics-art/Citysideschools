@@ -352,7 +352,34 @@
           </div>
           <div class="fg">
             <div class="ff"><label>Admission Number (Password)</label><input type="text" id="s-admno" placeholder="e.g. CSS/2025/001"></div>
-            <div class="ff"><label>Class</label>
+            <div class="ff" style="margin-bottom:14px">
+  <label>Student Photo (optional)</label>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+    <button type="button" onclick="triggerStudentPhoto('gallery')"
+      style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:9px;background:#fff;color:var(--mid);font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+      🖼 From Gallery
+    </button>
+    <button type="button" onclick="triggerStudentPhoto('camera')"
+      style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:9px;background:#fff;color:var(--mid);font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+      📷 Use Camera
+    </button>
+  </div>
+  <input type="file" id="s-photo-gallery" accept="image/*" style="display:none" onchange="previewStudentPhoto(event)">
+  <input type="file" id="s-photo-camera" accept="image/*" capture="user" style="display:none" onchange="previewStudentPhoto(event)">
+  <div id="s-photo-preview-wrap" style="display:none;align-items:center;gap:12px;background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:12px">
+    <img id="s-photo-preview" src="" alt="Preview"
+      style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--g)">
+    <div style="flex:1">
+      <div id="s-photo-name" style="font-size:.85rem;font-weight:600;color:var(--ink)">photo.jpg</div>
+      <div style="font-size:.75rem;color:var(--soft)">Photo ready</div>
+    </div>
+    <button type="button" onclick="clearStudentPhoto()"
+      style="padding:5px 12px;border:1px solid var(--rborder);border-radius:7px;background:var(--rbg);color:var(--red);font-size:.78rem;cursor:pointer">
+      Remove
+    </button>
+  </div>
+</div>
+<div class="ff"><label>Class</label>
               <select id="s-class">
                 <option value="">— Select Class —</option>
                 <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
@@ -672,15 +699,15 @@ async function loadStudents() {
 
     if (!list.length) { tb.innerHTML = `<tr class="empty-row"><td colspan="6">No students found.</td></tr>`; return; }
     tb.innerHTML = list.map((s, i) => `
-      <tr>
-        <td style="color:var(--soft)">${i+1}</td>
-        <td><strong>${s.surname}</strong></td>
-        <td>${s.firstName}</td>
-        <td><code style="background:var(--cream);padding:2px 7px;border-radius:5px;font-size:.82em">${s.admNo}</code></td>
-        <td><span class="badge bc">${s.class}</span></td>
-        <td><button class="btn-del" onclick="delStudent('${s.id}')">Delete</button></td>
-      </tr>
-    `).join('');
+  <tr>
+    <td style="color:var(--soft)">${i + 1}</td>
+    <td><strong>${s.surname}</strong></td>
+    <td>${s.firstName}</td>
+    <td><code style="background:var(--cream);padding:2px 7px;border-radius:5px;font-size:.82em">${s.admNo}</code></td>
+    <td><span class="badge bc">${s.class}</span></td>
+    <td><button class="btn-del" onclick="delStudent('${s.id}')">Delete</button></td>
+  </tr>
+`).join('');
   } catch { toast('⚠️ Could not load students.'); }
 }
 
