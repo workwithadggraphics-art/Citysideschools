@@ -442,7 +442,8 @@
 <!-- RESULT -->
 <div class="screen" id="s-result">
   <div class="result-wrap">
-    <div class="result-emoji" id="r-emoji">🎉</div>
+    <div id="result-avatar"></div>
+<div class="result-emoji" id="r-emoji">🎉</div>
     <h1 id="r-heading">Submitted!</h1>
     <p class="result-sub" id="r-sub">Your responses have been marked.</p>
     <div class="timeout-note" id="timeout-note">⏰ Time expired — exam was automatically submitted.</div>
@@ -841,6 +842,15 @@ async function finalSubmit() {
   document.getElementById('r-emoji').textContent   = r.pct >= 70 ? '🎉' : r.pct >= 50 ? '👍' : '📚';
   document.getElementById('r-heading').textContent = r.pct >= 70 ? 'Excellent Work!' : r.pct >= 50 ? 'Good Effort!' : 'Keep Pushing!';
   document.getElementById('r-sub').textContent     = currentStudent.firstName + ', here are your results for ' + r.subject + '.';
+// Show student photo on result screen
+const resultAvatar = document.getElementById('result-avatar');
+if (resultAvatar) {
+  if (currentStudent.photo) {
+    resultAvatar.innerHTML = `<img src="${currentStudent.photo}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--g);box-shadow:0 4px 16px var(--glow);display:block;margin:0 auto 16px">`;
+  } else {
+    resultAvatar.innerHTML = `<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--g),var(--g3));color:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;margin:0 auto 16px">${currentStudent.surname[0].toUpperCase()}</div>`;
+  }
+}
   document.getElementById('r-pct').textContent     = r.pct + '%';
   document.getElementById('r-correct').textContent = r.correct;
   document.getElementById('r-wrong').textContent   = r.wrong;
