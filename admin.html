@@ -767,11 +767,11 @@ async function addStudent() {
     if (!d.ok) { toast(`⚠️ ${d.error}`); }
     else {
       toast(`✅ ${firstName} ${surname} added to ${studentClass}`);
-clearStudentPhoto();
       document.getElementById('s-surname').value = '';
       document.getElementById('s-firstname').value = '';
       document.getElementById('s-admno').value = '';
       document.getElementById('s-class').value = '';
+      clearStudentPhoto();
       await loadStudents();
       await loadOverview();
     }
