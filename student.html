@@ -715,6 +715,15 @@ function renderQ() {
   // Render question text
   const qEl = document.getElementById('q-text');
   qEl.innerHTML = '';
+
+  // Show passage if present
+  if (q.passage) {
+    const passageEl = document.createElement('div');
+    passageEl.style.cssText = 'background:var(--ow);border-left:3px solid var(--g);padding:14px 16px;border-radius:8px;margin-bottom:16px;font-size:.92rem;line-height:1.75;color:var(--mid)';
+    passageEl.textContent = q.passage;
+    qEl.appendChild(passageEl);
+  }
+
   const textNode = document.createElement('div');
   textNode.textContent = q.question;
   qEl.appendChild(textNode);
