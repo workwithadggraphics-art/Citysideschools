@@ -765,8 +765,16 @@ async function loadStudents() {
     if (!list.length) { tb.innerHTML = `<tr class="empty-row"><td colspan="6">No students found.</td></tr>`; return; }
     tb.innerHTML = list.map((s, i) => `
   <tr>
-    <td style="color:var(--soft)">${i + 1}</td>
+    <td style="color:var(--soft)">${i+1}</td>
     <td>
+      <div style="display:flex;align-items:center;gap:9px">
+        ${s.photo
+          ? `<img src="${s.photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--g);flex-shrink:0">`
+          : `<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0">${s.surname[0].toUpperCase()}</div>`
+        }
+        <strong>${s.surname}</strong>
+      </div>
+    </td>
       <div style="display:flex;align-items:center;gap:9px">
         ${s.photo
           ? `<img src="${s.photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--g);flex-shrink:0">`
