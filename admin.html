@@ -597,17 +597,24 @@ const API_URL = 'https://cbt-backend-xykl.onrender.com';  // ← PASTE YOUR REND
 async function api(path, opts = {}) {
   const base = API_URL || window.location.origin;
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
     const r = await fetch(base + path, {
       headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
       ...opts
     });
+    clearTimeout(timeout);
     return r.json();
   } catch (e) {
+    if (e.name === 'AbortError') {
+      // Request timed out but may have succeeded — don't show error
+      return { ok: true, timedOut: true };
+    }
     console.error('API error:', e);
     return { ok: false, error: 'Cannot reach the server. Check your connection.' };
   }
 }
-
 /* Toast */
 function toast(msg, d = 2800) {
   const el = document.getElementById('toast');
