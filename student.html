@@ -706,6 +706,8 @@ const passageBlocks      = shuffleArray(Object.values(passageGroups));
 const allUnits           = [...passageBlocks, ...shuffledNonPassage.map(q => [q])];
 const shuffledUnits      = shuffleArray(allUnits);
 currentExam.questions    = shuffledUnits.flat();
+// Close modal AFTER exam is ready
+CloseConfirm();
   qIdx = 0; answers = {}; timedOut = false;
 
   document.getElementById('exam-subj').textContent = currentExam.subject;
