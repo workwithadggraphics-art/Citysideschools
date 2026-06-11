@@ -789,7 +789,10 @@ async function addStudent() {
   const admNo      = document.getElementById('s-admno').value.trim();
   const studentClass = document.getElementById('s-class').value;
   if (!surname || !firstName || !admNo || !studentClass) { toast('⚠️ Fill all student fields.'); return; }
-
+if (document.getElementById('s-photo-uploading').style.display === 'flex') {
+  toast('⚠️ Please wait for photo to finish uploading.');
+  return;
+}
   const btn = document.getElementById('add-s-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
 
