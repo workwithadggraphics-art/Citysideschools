@@ -785,33 +785,45 @@ async function loadStudents() {
 }
 
 async function addStudent() {
-  const surname    = document.getElementById('s-surname').value.trim();
-  const firstName  = document.getElementById('s-firstname').value.trim();
-  const admNo      = document.getElementById('s-admno').value.trim();
+  const surname      = document.getElementById('s-surname').value.trim();
+  const firstName    = document.getElementById('s-firstname').value.trim();
+  const admNo        = document.getElementById('s-admno').value.trim();
   const studentClass = document.getElementById('s-class').value;
-  if (!surname || !firstName || !admNo || !studentClass) { toast('⚠️ Fill all student fields.'); return; }
-if (document.getElementById('s-photo-uploading').style.display === 'flex') {
-  toast('⚠️ Please wait for photo to finish uploading.');
-  return;
-}
+
+  if (!surname || !firstName || !admNo || !studentClass) {
+    toast('⚠️ Fill all student fields.'); return;
+  }
+
+  const uploading = document.getElementById('s-photo-uploading');
+  if (uploading && uploading.style.display === 'flex') {
+    toast('⚠️ Please wait for photo to finish uploading.'); return;
+  }
+
   const btn = document.getElementById('add-s-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
 
   try {
-    const data = await api('/api/admin/students', { method:'POST', body: JSON.stringify({ surname, firstName, admNo, studentClass, photo: studentPhotoBase64 || null }) });
-    if (!d.ok) { toast(`⚠️ ${d.error}`); }
-    else {
+    const d = await api('/api/admin/students', {
+      method: 'POST',
+      body: JSON.stringify({
+        surname, firstName, admNo, studentClass,
+        photo: studentPhotoBase64 || null
+      })
+    });
+    if (!d.ok && !d.timedOut) {
+      toast(`⚠️ ${d.error || 'Could not save student.'}`);
+    } else {
       toast(`✅ ${firstName} ${surname} added to ${studentClass}`);
-      document.getElementById('s-surname').value = '';
+      document.getElementById('s-surname').value   = '';
       document.getElementById('s-firstname').value = '';
-      document.getElementById('s-admno').value = '';
-      document.getElementById('s-class').value = '';
+      document.getElementById('s-admno').value     = '';
+      document.getElementById('s-class').value     = '';
       clearStudentPhoto();
       await loadStudents();
       await loadOverview();
     }
   } catch { toast('⚠️ Network error.'); }
-  finally { btn.disabled = false; btn.textContent = '+ Add Student'; }
+  finally  { btn.disabled = false; btn.textContent = '+ Add Student'; }
 }
 
 async function delStudent(id) {
