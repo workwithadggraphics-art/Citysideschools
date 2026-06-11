@@ -684,10 +684,28 @@ async function beginExam() {
   }
 
   currentExam = data.exam;
-  // Tag each question with original server index before shuffling
-  currentExam.questions = currentExam.questions.map((q, i) => ({ ...q, originalIndex: i }));
-  currentExam.questions = shuffleArray(currentExam.questions);
-  closeConfirm();
+ // Tag with original index
+currentExam.questions = currentExam.questions.map((q, i) => ({ ...q, originalIndex: i }));
+
+// Group passage questions as blocks, shuffle blocks not individual questions
+const passageGroups = {};
+const nonPassage    = [];
+
+currentExam.questions.forEach(q => {
+  if (q.passage) {
+    const key = q.passage.substring(0, 30);
+    if (!passageGroups[key]) passageGroups[key] = [];
+    passageGroups[key].push(q);
+  } else {
+    nonPassage.push(q);
+  }
+});
+
+const shuffledNonPassage = shuffleArray(nonPassage);
+const passageBlocks      = shuffleArray(Object.values(passageGroups));
+const allUnits           = [...passageBlocks, ...shuffledNonPassage.map(q => [q])];
+const shuffledUnits      = shuffleArray(allUnits);
+currentExam.questions    = shuffledUnits.flat();
   qIdx = 0; answers = {}; timedOut = false;
 
   document.getElementById('exam-subj').textContent = currentExam.subject;
