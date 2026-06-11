@@ -973,26 +973,51 @@ function handleFile(evt) {
 
 function parseQs(text) {
   const qs = [];
-  text.trim().split(/\n\s*\n/).forEach(block => {
+  const blocks = text.trim().split(/\n\s*\n/);
+  let currentPassage = null;
+
+  blocks.forEach(block => {
     const lines = block.trim().split('\n').map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return;
+
+    // Detect passage block
+    if (/^PASSAGE\s*:/i.test(lines[0])) {
+      currentPassage = lines.join(' ').replace(/^PASSAGE\s*:\s*/i, '').trim();
+      return;
+    }
+
+    // Detect end of passage group
+    if (/^END\s*PASSAGE/i.test(lines[0])) {
+      currentPassage = null;
+      return;
+    }
+
     if (lines.length < 2) return;
+
     const qLine = lines[0].replace(/^\d+[.)]\s*/, '').trim();
-    const get = lt => { const l = lines.find(x => new RegExp(`^${lt}[.)]\\s*`,'i').test(x)); return l ? l.replace(new RegExp(`^${lt}[.)]\\s*`,'i'),'').trim() : ''; };
+    const get = lt => {
+      const l = lines.find(x => new RegExp(`^${lt}[.)\\s]`,'i').test(x));
+      return l ? l.replace(new RegExp(`^${lt}[.)\\s]+`,'i'),'').trim() : '';
+    };
     const a = get('A'), b = get('B'), c = get('C'), d = get('D');
     const al = lines.find(l => /^ANSWER\s*:/i.test(l)) || '';
     const rawAnswer = al.replace(/^ANSWER\s*:\s*/i,'').trim();
-const answer = rawAnswer.toUpperCase().charAt(0);
-    const typeLine = lines.find(l => /^TYPE\s*:/i.test(l)) || '';
-const qType = typeLine.replace(/^TYPE\s*:\s*/i, '').trim().toLowerCase();
+    const typeLine  = lines.find(l => /^TYPE\s*:/i.test(l)) || '';
+    const qType     = typeLine.replace(/^TYPE\s*:\s*/i,'').trim().toLowerCase();
+    const isFill    = qType === 'fill' || (!a && !b && !c && !d);
 
-// Auto-detect fill in blank if no options found OR TYPE: FILL declared
-const isFill = qType === 'fill' || (!a && !b && !c && !d);
-
-if (isFill) {
-  if (qLine && rawAnswer) qs.push({ question: qLine, type: 'fill', answer: rawAnswer });
-} else {
-  if (qLine && a && b && c && d && answer) qs.push({ question: qLine, type: 'mcq', a, b, c, d, answer });
-}
+    if (isFill) {
+      if (qLine && rawAnswer) qs.push({
+        question: qLine, type: 'fill', answer: rawAnswer,
+        passage: currentPassage || null
+      });
+    } else {
+      const answer = rawAnswer.toUpperCase().charAt(0);
+      if (qLine && a && b && c && d && answer) qs.push({
+        question: qLine, type: 'mcq', a, b, c, d, answer,
+        passage: currentPassage || null
+      });
+    }
   });
   return qs;
 }
