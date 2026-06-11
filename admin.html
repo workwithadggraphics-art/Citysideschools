@@ -738,8 +738,9 @@ async function uploadStudentPhoto(evt) {
       toast('⚠️ Photo upload failed. Try again.');
     }
   } catch (e) {
-    toast('⚠️ Could not upload photo. Check your connection.');
-  } finally {
+  console.error('Photo upload error:', e);
+  toast('⚠️ Photo upload failed — student will be saved without photo.');
+} finally {
     document.getElementById('s-photo-uploading').style.display = 'none';
     // Reset file inputs
     document.getElementById('s-photo-gallery').value = '';
