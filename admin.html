@@ -758,7 +758,15 @@ async function loadStudents() {
     tb.innerHTML = list.map((s, i) => `
   <tr>
     <td style="color:var(--soft)">${i + 1}</td>
-    <td><strong>${s.surname}</strong></td>
+    <td>
+      <div style="display:flex;align-items:center;gap:9px">
+        ${s.photo
+          ? `<img src="${s.photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--g);flex-shrink:0">`
+          : `<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0">${s.surname[0].toUpperCase()}</div>`
+        }
+        <strong>${s.surname}</strong>
+      </div>
+    </td>
     <td>${s.firstName}</td>
     <td><code style="background:var(--cream);padding:2px 7px;border-radius:5px;font-size:.82em">${s.admNo}</code></td>
     <td><span class="badge bc">${s.class}</span></td>
