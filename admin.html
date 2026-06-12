@@ -431,9 +431,22 @@
             </div>
           </div>
           <div class="fg">
-            <div class="ff"><label>Time (minutes)</label><input type="number" id="e-time" placeholder="e.g. 60" min="5" max="180"></div>
-            <div class="ff"><label>Icon (emoji)</label><input type="text" id="e-icon" placeholder="e.g. 📐" maxlength="2"></div>
-          </div>
+  <div class="ff"><label>Time (minutes)</label><input type="number" id="e-time" placeholder="e.g. 60" min="5" max="180"></div>
+  <div class="ff"><label>Icon (emoji)</label><input type="text" id="e-icon" placeholder="e.g. 📐" maxlength="2"></div>
+</div>
+<div class="fg">
+  <div class="ff">
+    <label>Exam Date (leave blank to make always available)</label>
+    <input type="date" id="e-date">
+  </div>
+  <div class="ff">
+    <label>Status</label>
+    <select id="e-status">
+  <option value="closed">Closed (locked until opened)</option>
+  <option value="open">Open (available now)</option>
+    </select>
+  </div>
+</div>
           <div class="fg one" style="margin-bottom:16px">
             <div class="ff"><label>Instructions (shown to students before start)</label><textarea id="e-instr" placeholder="e.g. Answer all 40 questions. Each carries 1 mark."></textarea></div>
           </div>
@@ -1079,7 +1092,13 @@ async function loadExams() {
         <td>${e.questions.length}</td>
         <td>${e.time} min</td>
         <td><span class="badge ba">● Live</span></td>
-        <td><button class="btn-del" onclick="delExam('${e.id}')">Delete</button></td>
+        <td style="display:flex;gap:6px">
+  <button onclick="toggleExam('${e.id}','${e.examStatus}')"
+    style="padding:4px 11px;border-radius:7px;border:1px solid;font-size:.78rem;font-weight:600;cursor:pointer;${e.examStatus === 'open' ? 'background:#fef2f2;border-color:#fca5a5;color:#dc2626' : 'background:#dcfce7;border-color:#86efac;color:#166534'}">
+    ${e.examStatus === 'open' ? 'Close' : 'Open'}
+  </button>
+  <button class="btn-del" onclick="delExam('${e.id}')">Delete</button>
+</td>
       </tr>
     `).join('');
   } catch { toast('⚠️ Could not load exams.'); }
