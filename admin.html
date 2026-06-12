@@ -1103,7 +1103,19 @@ async function loadExams() {
     `).join('');
   } catch { toast('⚠️ Could not load exams.'); }
 }
-
+async function toggleExam(id, currentStatus) {
+  const newStatus = currentStatus === 'open' ? 'closed' : 'open';
+  const label     = newStatus === 'open' ? 'opened' : 'closed';
+  try {
+    const d = await api(`/api/admin/exams/${id}/status`, {
+      method: 'POST',
+      body:   JSON.stringify({ examStatus: newStatus })
+    });
+    if (!d.ok) { toast(`⚠️ ${d.error}`); return; }
+    toast(`✅ Exam ${label} successfully.`);
+    await loadExams();
+  } catch { toast('⚠️ Network error.'); }
+}
 async function delExam(id) {
   if (!confirm('Delete this exam?')) return;
   try {
