@@ -221,7 +221,23 @@
   .options{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:32px;}
   .opt{display:flex;align-items:flex-start;gap:12px;padding:15px 18px;border:2px solid var(--border);border-radius:13px;background:#fff;cursor:pointer;text-align:left;transition:all .18s;font-family:'Outfit',sans-serif;}
   .opt:hover{border-color:var(--g);background:var(--gl);}
-  .opt.picked{border-color:var(--g2);background:var(--gl);box-shadow:0 0 0 3px var(--glow);}
+  .opt.picked {
+  border-color:var(--g2);
+  border-width: 2.5px;
+  background:var(--gl);
+  box-shadow:0 0 0 4px rgba(4,120,87,0.2);
+}
+
+.opt.picked .opt-key {
+  background:var(--g2);
+  color:#fff;
+  transform: scale(1.1);
+}
+
+.opt.picked .opt-text {
+  color: var(--g2);
+  font-weight: 600;
+}
   .opt-key{min-width:28px;height:28px;border-radius:8px;background:var(--ow2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;color:var(--mid);transition:all .18s;flex-shrink:0;}
   .opt.picked .opt-key{background:var(--g2);color:#fff;}
   .opt-text{font-size:.93rem;color:var(--ink);line-height:1.5;padding-top:2px;}
