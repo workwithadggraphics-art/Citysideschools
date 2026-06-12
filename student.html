@@ -622,13 +622,17 @@ async function setupDashboard() {
     grid.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>No examinations available for your class right now.</p></div>';
   } else {
     grid.innerHTML = examList.map(e => `
-      <div class="subject-card" onclick="openConfirm('${e.id}')">
-        <div class="sc-icon">${e.icon || '📚'}</div>
-        <div class="sc-title">${e.subject}</div>
-        <div class="sc-meta">${e.questionCount} questions &nbsp;·&nbsp; ${e.time} minutes</div>
-        <div class="sc-pill">Available Now</div>
-      </div>
-    `).join('');
+  <div class="subject-card ${e.locked ? 'locked-card' : ''}"
+    onclick="${e.locked ? 'showLocked()' : `openConfirm('${e.id}')`}">
+    <div class="sc-icon" style="${e.locked ? 'filter:grayscale(1);opacity:.6' : ''}">${e.icon || '📚'}</div>
+    <div class="sc-title" style="${e.locked ? 'color:var(--soft)' : ''}">${e.subject}</div>
+    <div class="sc-meta">${e.questionCount} questions &nbsp;·&nbsp; ${e.time} minutes</div>
+    ${e.locked
+      ? '<div style="display:inline-flex;align-items:center;gap:5px;margin-top:14px;background:#f3f4f6;color:#6b7280;font-size:.75rem;font-weight:600;padding:3px 10px;border-radius:20px">🔒 Not Yet Available</div>'
+      : '<div class="sc-pill">Available Now</div>'
+    }
+  </div>
+`).join('');
   }
 
   // ── Taken / completed exams ──
