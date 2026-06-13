@@ -980,19 +980,46 @@ function removeBuilderQ(idx) {
   document.getElementById('builder-count').textContent = `${parsedQs.length} question(s) added`;
 }
 /* ── EXAMS ── */
-function handleFile(evt) {
+async function handleFile(evt) {
   const file = evt.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    parsedQs = parseQs(e.target.result);
-    document.getElementById('file-name').textContent = file.name;
-    document.getElementById('file-ok').textContent = `✓ ${parsedQs.length} questions parsed`;
-    document.getElementById('file-badge').classList.add('show');
-  };
-  reader.readAsText(file);
-}
 
+  document.getElementById('file-name').textContent = file.name;
+  document.getElementById('file-ok').textContent   = 'Parsing…';
+  document.getElementById('file-badge').classList.add('show');
+
+  try {
+    let text = '';
+
+    if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
+      // Extract plain text from Word document using mammoth.js
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+// Convert HTML back to plain text but preserve underline markers
+text = result.value
+  .replace(/<u>(.*?)<\/u>/gi, '[$1]')     // underlined → [word]
+  .replace(/<strong>(.*?)<\/strong>/gi, '$1')
+  .replace(/<em>(.*?)<\/em>/gi, '$1')
+  .replace(/<[^>]+>/g, '')                 // strip remaining HTML tags
+  .replace(/&nbsp;/g, ' ')
+  .replace(/&amp;/g, '&')
+  .replace(/&lt;/g, '<')
+  .replace(/&gt;/g, '>');
+    } else {
+      // Plain .txt file
+      text = await file.text();
+    }
+
+    parsedQs = parseQs(text);
+    document.getElementById('file-ok').textContent = `✓ ${parsedQs.length} questions parsed`;
+
+  } catch (e) {
+    console.error('File parsing error:', e);
+    toast('⚠️ Could not read file. Make sure it is a valid .txt or .docx file.');
+    document.getElementById('file-badge').classList.remove('show');
+    parsedQs = [];
+  }
+}
 function parseQs(text) {
   const qs = [];
   const blocks = text.trim().split(/\n\s*\n/);
