@@ -784,7 +784,8 @@ function renderQ() {
   }
 
   const textNode = document.createElement('div');
-  textNode.textContent = q.question;
+  // Render [word] as underlined text
+textNode.innerHTML = q.question.replace(/\[([^\]]+)\]/g, '<u>$1</u>');
   qEl.appendChild(textNode);
 
   if (q.image) {
