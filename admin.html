@@ -1022,7 +1022,18 @@ text = result.value
 }
 function parseQs(text) {
   const qs = [];
-  const blocks = text.trim().split(/\n\s*\n/);
+  // Normalize line endings and handle both single and double newline separators
+const normalized = text
+  .replace(/\r\n/g, '\n')
+  .replace(/\r/g, '\n');
+
+// Try double-newline split first, fall back to detecting question blocks by number pattern
+let blocks = normalized.split(/\n\s*\n/);
+
+// If we got very few blocks (mammoth single-newline output), re-split differently
+if (blocks.length < 3) {
+  blocks = normalized.split(/\n(?=\d+\.\s|PASSAGE\s*:|END\s*PASSAGE|ANSWER\s*:|TYPE\s*:)/i);
+}
   let currentPassage = null;
 
   blocks.forEach(block => {
@@ -1041,8 +1052,7 @@ function parseQs(text) {
       return;
     }
 
-    if (lines.length < 2) return;
-
+    if (!lines.length) return;
     const qLine = lines[0].replace(/^\d+[.)]\s*/, '').trim();
     const get = lt => {
       const l = lines.find(x => new RegExp(`^${lt}[.)\\s]`,'i').test(x));
