@@ -1034,7 +1034,7 @@ function parseQs(text) {
 
   allLines.forEach(line => {
     const isBlockStart =
-      /^\d+[.)]\s/.test(line) ||
+      /^\d+[\. )]\s/.test(line) ||
       /^PASSAGE\s*:/i.test(line) ||
       /^END\s*PASSAGE/i.test(line);
 
