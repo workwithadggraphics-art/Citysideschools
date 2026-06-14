@@ -1011,8 +1011,7 @@ text = result.value
     }
 
     parsedQs = parseQs(text);
-    document.getElementById('file-ok').textContent = `✓ ${parsedQs.length} questions parsed`;
-
+document.getElementById('file-ok').textContent = `✓ ${parsedQs.length} parsed | chars: ${text.length} | sample: ${text.substring(0,50)}`;
   } catch (e) {
     console.error('File parsing error:', e);
     toast('⚠️ Could not read file. Make sure it is a valid .txt or .docx file.');
