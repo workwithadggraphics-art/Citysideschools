@@ -1021,62 +1021,90 @@ document.getElementById('file-ok').textContent = `✓ ${parsedQs.length} parsed 
 }
 function parseQs(text) {
   const qs = [];
-  // Normalize line endings and handle both single and double newline separators
-const normalized = text
-  .replace(/\r\n/g, '\n')
-  .replace(/\r/g, '\n');
 
-// Try double-newline split first, fall back to detecting question blocks by number pattern
-let blocks = normalized.split(/\n\s*\n/);
+  // Normalize line endings
+  text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-// If we got very few blocks (mammoth single-newline output), re-split differently
-if (blocks.length < 3) {
-  blocks = normalized.split(/\n(?=\d+\.\s|PASSAGE\s*:|END\s*PASSAGE|ANSWER\s*:|TYPE\s*:)/i);
-}
+  // Split into lines first
+  const allLines = text.split('\n').map(l => l.trim());
+
+  // Group lines into blocks — a new block starts when we hit a numbered question,
+  // PASSAGE:, END PASSAGE, or a blank line after content
+  const blocks = [];
+  let current = [];
+
+  allLines.forEach(line => {
+    const isBlockStart =
+      /^\d+[\.\)]\s/.test(line) ||
+      /^PASSAGE\s*:/i.test(line) ||
+      /^END\s*PASSAGE/i.test(line);
+
+    if (isBlockStart && current.length > 0) {
+      blocks.push(current);
+      current = [line];
+    } else if (line === '') {
+      if (current.length > 0) {
+        blocks.push(current);
+        current = [];
+      }
+    } else {
+      current.push(line);
+    }
+  });
+  if (current.length > 0) blocks.push(current);
+
   let currentPassage = null;
 
-  blocks.forEach(block => {
-    const lines = block.trim().split('\n').map(l => l.trim()).filter(Boolean);
+  blocks.forEach(lines => {
+    lines = lines.filter(Boolean);
     if (!lines.length) return;
 
-    // Detect passage block
-    if (/^PASSAGE\s*:/i.test(lines[0])) {
-      currentPassage = lines.join(' ').replace(/^PASSAGE\s*:\s*/i, '').trim();
+    const first = lines[0];
+
+    // Detect PASSAGE block
+    if (/^PASSAGE\s*:/i.test(first)) {
+      currentPassage = first.replace(/^PASSAGE\s*:\s*/i, '').trim();
       return;
     }
 
-    // Detect end of passage group
-    if (/^END\s*PASSAGE/i.test(lines[0])) {
+    // Detect END PASSAGE
+    if (/^END\s*PASSAGE/i.test(first)) {
       currentPassage = null;
       return;
     }
 
-    if (!lines.length) return;
-    const qLine = lines[0].replace(/^\d+[.)]\s*/, '').trim();
+    // Must start with a question number
+    if (!/^\d+[\.\)]\s/.test(first)) return;
+
+    const qLine = first.replace(/^\d+[\.\)]\s*/, '').trim();
+
     const get = lt => {
-      const l = lines.find(x => new RegExp(`^${lt}[.)\\s]`,'i').test(x));
-      return l ? l.replace(new RegExp(`^${lt}[.)\\s]+`,'i'),'').trim() : '';
+      const l = lines.find(x => new RegExp('^' + lt + '[.)\\s]', 'i').test(x));
+      return l ? l.replace(new RegExp('^' + lt + '[.)\\s]+', 'i'), '').trim() : '';
     };
+
     const a = get('A'), b = get('B'), c = get('C'), d = get('D');
+
     const al = lines.find(l => /^ANSWER\s*:/i.test(l)) || '';
-    const rawAnswer = al.replace(/^ANSWER\s*:\s*/i,'').trim();
-    const typeLine  = lines.find(l => /^TYPE\s*:/i.test(l)) || '';
-    const qType     = typeLine.replace(/^TYPE\s*:\s*/i,'').trim().toLowerCase();
-    const isFill    = qType === 'fill' || (!a && !b && !c && !d);
+    const rawAnswer = al.replace(/^ANSWER\s*:\s*/i, '').trim();
+
+    const typeLine = lines.find(l => /^TYPE\s*:/i.test(l)) || '';
+    const isFill   = /fill/i.test(typeLine) || (!a && !b && !c && !d);
 
     if (isFill) {
       if (qLine && rawAnswer) qs.push({
-        question: qLine, type: 'fill', answer: rawAnswer,
-        passage: currentPassage || null
+        question: qLine, type: 'fill',
+        answer: rawAnswer, passage: currentPassage || null
       });
     } else {
       const answer = rawAnswer.toUpperCase().charAt(0);
       if (qLine && a && b && c && d && answer) qs.push({
-        question: qLine, type: 'mcq', a, b, c, d, answer,
-        passage: currentPassage || null
+        question: qLine, type: 'mcq',
+        a, b, c, d, answer, passage: currentPassage || null
       });
     }
   });
+
   return qs;
 }
 
