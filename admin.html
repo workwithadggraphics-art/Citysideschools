@@ -1050,38 +1050,66 @@ async function readDocxText(file) {
 async function extractFileFromZip(u8, targetPath) {
   let i = 0;
   while (i < u8.length - 4) {
+    // Local file header signature: PK\x03\x04
     if (u8[i]===0x50 && u8[i+1]===0x4B && u8[i+2]===0x03 && u8[i+3]===0x04) {
       const compression = u8[i+8]  | (u8[i+9]  << 8);
       const compSize    = u8[i+18] | (u8[i+19] << 8) | (u8[i+20] << 16) | (u8[i+21] << 24);
+      const uncompSize  = u8[i+22] | (u8[i+23] << 8) | (u8[i+24] << 16) | (u8[i+25] << 24);
       const fnLen       = u8[i+26] | (u8[i+27] << 8);
       const extraLen    = u8[i+28] | (u8[i+29] << 8);
-      const fileName    = new TextDecoder().decode(u8.slice(i+30, i+30+fnLen));
-      const dataStart   = i + 30 + fnLen + extraLen;
+
+      let fileName;
+      try {
+        fileName = new TextDecoder('utf-8').decode(u8.slice(i+30, i+30+fnLen));
+      } catch(e) {
+        fileName = '';
+      }
+
+      const dataStart = i + 30 + fnLen + extraLen;
+
+      // Guard against bad compSize values
+      if (compSize < 0 || dataStart + compSize > u8.length) {
+        i++;
+        continue;
+      }
 
       if (fileName === targetPath) {
         const compressed = u8.slice(dataStart, dataStart + compSize);
+
         if (compression === 0) {
-          return new TextDecoder().decode(compressed);
+          // Stored — no compression
+          return new TextDecoder('utf-8').decode(compressed);
+
         } else if (compression === 8) {
-          const ds     = new DecompressionStream('deflate-raw');
-          const writer = ds.writable.getWriter();
-          const reader = ds.readable.getReader();
-          writer.write(compressed);
-          writer.close();
-          const chunks = [];
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            chunks.push(value);
+          // DEFLATE
+          try {
+            const ds     = new DecompressionStream('deflate-raw');
+            const writer = ds.writable.getWriter();
+            const reader = ds.readable.getReader();
+            writer.write(compressed);
+            writer.close();
+            const chunks = [];
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              chunks.push(value);
+            }
+            const total = chunks.reduce((a, c) => a + c.length, 0);
+            const out   = new Uint8Array(total);
+            let off = 0;
+            for (const c of chunks) { out.set(c, off); off += c.length; }
+            return new TextDecoder('utf-8').decode(out);
+          } catch (e) {
+            console.error('Decompression failed:', e);
+            throw new Error('Could not decompress docx. Try saving as a newer .docx format.');
           }
-          const total = chunks.reduce((a, c) => a + c.length, 0);
-          const out   = new Uint8Array(total);
-          let off = 0;
-          for (const c of chunks) { out.set(c, off); off += c.length; }
-          return new TextDecoder().decode(out);
+        } else {
+          throw new Error('Unsupported zip compression method: ' + compression);
         }
       }
-      i = dataStart + compSize;
+
+      // Move to next entry
+      i = dataStart + Math.max(compSize, 0);
     } else {
       i++;
     }
