@@ -1006,14 +1006,87 @@ async function handleFile(evt) {
     parsedQs = [];
   }
 }
-parsedQs = parseQs(text);
-document.getElementById('file-ok').textContent = `✓ ${parsedQs.length} questions parsed`;
-  } catch (e) {
-    console.error('File parsing error:', e);
-    toast('⚠️ Could not read file. Make sure it is a valid .txt or .docx file.');
-    document.getElementById('file-badge').classList.remove('show');
-    parsedQs = [];
+async function readDocxText(file) {
+  const ab  = await file.arrayBuffer();
+  const u8  = new Uint8Array(ab);
+  const xml = await extractFileFromZip(u8, 'word/document.xml');
+  if (!xml) throw new Error('Could not read document.xml from docx');
+
+  const parser = new DOMParser();
+  const doc    = parser.parseFromString(xml, 'text/xml');
+  const ns     = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+
+  const paragraphs = doc.getElementsByTagNameNS(ns, 'p');
+  const lines = [];
+
+  for (const para of paragraphs) {
+    const runs = para.getElementsByTagNameNS(ns, 'r');
+    let paraText = '';
+
+    for (const run of runs) {
+      const rPr = run.getElementsByTagNameNS(ns, 'rPr')[0];
+      const uEl = rPr ? rPr.getElementsByTagNameNS(ns, 'u')[0] : null;
+      const hasUnderline = uEl && uEl.getAttributeNS(ns, 'val') !== 'none';
+
+      const tEls = run.getElementsByTagNameNS(ns, 't');
+      let word = '';
+      for (const t of tEls) word += t.textContent;
+
+      if (hasUnderline && word.trim()) {
+        paraText += '[' + word + ']';
+      } else {
+        paraText += word;
+      }
+    }
+
+    const trimmed = paraText.trim();
+    if (trimmed) lines.push(trimmed);
+    else if (lines.length && lines[lines.length - 1] !== '') lines.push('');
   }
+
+  return lines.join('\n');
+}
+
+async function extractFileFromZip(u8, targetPath) {
+  let i = 0;
+  while (i < u8.length - 4) {
+    if (u8[i]===0x50 && u8[i+1]===0x4B && u8[i+2]===0x03 && u8[i+3]===0x04) {
+      const compression = u8[i+8]  | (u8[i+9]  << 8);
+      const compSize    = u8[i+18] | (u8[i+19] << 8) | (u8[i+20] << 16) | (u8[i+21] << 24);
+      const fnLen       = u8[i+26] | (u8[i+27] << 8);
+      const extraLen    = u8[i+28] | (u8[i+29] << 8);
+      const fileName    = new TextDecoder().decode(u8.slice(i+30, i+30+fnLen));
+      const dataStart   = i + 30 + fnLen + extraLen;
+
+      if (fileName === targetPath) {
+        const compressed = u8.slice(dataStart, dataStart + compSize);
+        if (compression === 0) {
+          return new TextDecoder().decode(compressed);
+        } else if (compression === 8) {
+          const ds     = new DecompressionStream('deflate-raw');
+          const writer = ds.writable.getWriter();
+          const reader = ds.readable.getReader();
+          writer.write(compressed);
+          writer.close();
+          const chunks = [];
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+          }
+          const total = chunks.reduce((a, c) => a + c.length, 0);
+          const out   = new Uint8Array(total);
+          let off = 0;
+          for (const c of chunks) { out.set(c, off); off += c.length; }
+          return new TextDecoder().decode(out);
+        }
+      }
+      i = dataStart + compSize;
+    } else {
+      i++;
+    }
+  }
+  return null;
 }
 function parseQs(text) {
   const qs = [];
