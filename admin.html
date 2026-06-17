@@ -1103,9 +1103,31 @@ async function extractFileFromZip(u8, targetPath) {
             console.error('Decompression failed:', e);
             throw new Error('Could not decompress docx. Try saving as a newer .docx format.');
           }
-        } else {
-          throw new Error('Unsupported zip compression method: ' + compression);
-        }
+        } else if (compression === 0) {
+  return new TextDecoder('utf-8').decode(u8.slice(dataStart, dataStart + uncompSize));
+} else {
+  // Try deflate anyway as fallback
+  try {
+    const ds = new DecompressionStream('deflate-raw');
+    const writer = ds.writable.getWriter();
+    const reader = ds.readable.getReader();
+    writer.write(u8.slice(dataStart, dataStart + compSize));
+    writer.close();
+    const chunks = [];
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+    }
+    const total = chunks.reduce((a,c) => a + c.length, 0);
+    const out = new Uint8Array(total);
+    let off = 0;
+    for (const c of chunks) { out.set(c, off); off += c.length; }
+    return new TextDecoder('utf-8').decode(out);
+  } catch(e) {
+    throw new Error('Unsupported docx format. Please save as .docx from Google Docs or Microsoft Word online.');
+  }
+}
       }
 
       // Move to next entry
