@@ -1007,7 +1007,15 @@ async function handleFile(evt) {
   }
 }
 async function readDocxText(file) {
-  const ab  = await file.arrayBuffer();
+  // Read file immediately before Android can revoke the handle
+let ab;
+try {
+  ab = await file.arrayBuffer();
+} catch(e) {
+  // Retry once
+  await new Promise(r => setTimeout(r, 200));
+  ab = await file.arrayBuffer();
+}
   const u8  = new Uint8Array(ab);
   const xml = await extractFileFromZip(u8, 'word/document.xml');
   if (!xml) throw new Error('Could not read document.xml from docx');
