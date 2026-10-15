@@ -762,6 +762,11 @@ async function beginExam() {
   startTimer(currentExam.time * 60);
   show('s-exam');
   btn.textContent = 'Yes, Start →'; btn.disabled = false;
+  // Reset violation counter for this exam session
+tabViolations = 0;
+
+// Detect tab switching / app minimising
+document.addEventListener('visibilitychange', handleVisibilityChange);
 }
 
 function renderQ() {
