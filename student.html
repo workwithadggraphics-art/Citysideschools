@@ -528,7 +528,8 @@ let timerInt       = null;
 let timerSecs      = 0;
 let timedOut       = false;
 let pendingExam    = null;
-
+let tabViolations  = 0;
+const MAX_VIOLATIONS = 3;
 /* ═══════════════ INIT ═══════════════ */
 (async function init() {
   try {
