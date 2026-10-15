@@ -910,6 +910,7 @@ function trySubmit() {
 }
 
 async function finalSubmit() {
+document.removeEventListener('visibilitychange', handleVisibilityChange);
   clearInterval(timerInt);
 
   // Map shuffled answers back to original server index for correct marking
