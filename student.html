@@ -678,6 +678,37 @@ function renderTakenSection() {
     `;
   }).join('');
 }
+function handleVisibilityChange() {
+  // Only active during an exam
+  if (!currentExam || document.visibilityState !== 'hidden') return;
+
+  tabViolations++;
+
+  if (tabViolations >= MAX_VIOLATIONS) {
+    // Remove listener so it doesn't fire again
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    timedOut = false;
+
+    // Show brief message then auto-submit
+    alert('⚠️ You have left the exam tab ' + MAX_VIOLATIONS + ' times. Your exam is being submitted automatically.');
+    finalSubmit();
+
+  } else {
+    const remaining = MAX_VIOLATIONS - tabViolations;
+    // Show warning when they come back
+    document.addEventListener('visibilitychange', function warnOnReturn() {
+      if (document.visibilityState === 'visible') {
+        document.removeEventListener('visibilitychange', warnOnReturn);
+        const toast = document.getElementById('tab-warning-toast');
+        if (toast) {
+          toast.textContent = '⚠️ Warning ' + tabViolations + '/' + MAX_VIOLATIONS + ': You left the exam tab. ' + remaining + ' warning(s) remaining before auto-submit.';
+          toast.style.display = 'block';
+          setTimeout(() => { toast.style.display = 'none'; }, 5000);
+        }
+      }
+    });
+  }
+}
 function showLocked() {
   alert('This exam is not yet available. Please wait for your teacher to open it.');
 }
