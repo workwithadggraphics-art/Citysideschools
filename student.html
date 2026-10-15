@@ -585,6 +585,8 @@ async function doLogin() {
 }
 
 function doLogout() {
+document.removeEventListener('visibilitychange', handleVisibilityChange);
+tabViolations = 0;
   clearInterval(timerInt);
   currentStudent = null; currentExam = null;
   answers = {}; timedOut = false; pendingExam = null; takenList = [];
