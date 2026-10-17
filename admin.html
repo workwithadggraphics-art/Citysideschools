@@ -594,7 +594,49 @@
     </div>
   </div>
 </div>
-
+<!-- Edit Student Modal -->
+<div id="edit-student-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:20px;padding:36px 32px;max-width:420px;width:92%;box-shadow:0 24px 60px rgba(0,0,0,0.25)">
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--ink);margin-bottom:20px">Edit Student</h3>
+    <input type="hidden" id="edit-student-id">
+    <div class="fg" style="margin-bottom:14px">
+      <div class="ff">
+        <label>Surname</label>
+        <input type="text" id="edit-surname" placeholder="Surname">
+      </div>
+      <div class="ff">
+        <label>First Name</label>
+        <input type="text" id="edit-firstname" placeholder="First Name">
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:20px">
+      <div class="ff">
+        <label>Admission Number</label>
+        <input type="text" id="edit-admno" placeholder="Admission No.">
+      </div>
+      <div class="ff">
+        <label>Class</label>
+        <select id="edit-class">
+          <option value="">— Select Class —</option>
+          <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+          <option>SSS 1 Science</option><option>SSS 1 Art</option><option>SSS 1 Commercial</option>
+          <option>SSS 2 Science</option><option>SSS 2 Art</option><option>SSS 2 Commercial</option>
+          <option>SSS 3 Science</option><option>SSS 3 Art</option><option>SSS 3 Commercial</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px">
+      <button onclick="closeEditStudent()"
+        style="flex:1;padding:12px;border:1.5px solid var(--border);border-radius:10px;background:transparent;color:var(--mid);font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer">
+        Cancel
+      </button>
+      <button onclick="saveEditStudent()" id="edit-save-btn"
+        style="flex:1;padding:12px;background:linear-gradient(135deg,var(--g),var(--g2));border:none;border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer">
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
