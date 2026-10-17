@@ -853,6 +853,51 @@ async function addStudent() {
   finally  { btn.disabled = false; btn.textContent = '+ Add Student'; }
 }
 
+function openEditStudent(id, surname, firstName, admNo, cls) {
+  document.getElementById('edit-student-id').value   = id;
+  document.getElementById('edit-surname').value      = surname;
+  document.getElementById('edit-firstname').value    = firstName;
+  document.getElementById('edit-admno').value        = admNo;
+  document.getElementById('edit-class').value        = cls;
+  const overlay = document.getElementById('edit-student-overlay');
+  overlay.style.display = 'flex';
+}
+
+function closeEditStudent() {
+  document.getElementById('edit-student-overlay').style.display = 'none';
+}
+
+async function saveEditStudent() {
+  const id          = document.getElementById('edit-student-id').value;
+  const surname     = document.getElementById('edit-surname').value.trim();
+  const firstName   = document.getElementById('edit-firstname').value.trim();
+  const admNo       = document.getElementById('edit-admno').value.trim();
+  const studentClass = document.getElementById('edit-class').value;
+
+  if (!surname || !firstName || !admNo || !studentClass) {
+    toast('⚠️ All fields are required.'); return;
+  }
+
+  const btn = document.getElementById('edit-save-btn');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+
+  try {
+    const d = await api(`/api/admin/students/${id}`, {
+      method: 'PUT',
+      body:   JSON.stringify({ surname, firstName, admNo, studentClass })
+    });
+
+    if (!d.ok) {
+      toast(`⚠️ ${d.error}`);
+    } else {
+      toast(`✅ ${firstName} ${surname} updated successfully.`);
+      closeEditStudent();
+      await loadStudents();
+      await loadOverview();
+    }
+  } catch { toast('⚠️ Network error.'); }
+  finally  { btn.textContent = 'Save Changes'; btn.disabled = false; }
+}
 async function delStudent(id) {
   if (!confirm('Delete this student?')) return;
   try {
