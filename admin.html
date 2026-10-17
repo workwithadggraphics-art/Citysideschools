@@ -799,7 +799,13 @@ async function loadStudents() {
     <td>${s.firstName}</td>
     <td><code style="background:var(--cream);padding:2px 7px;border-radius:5px;font-size:.82em">${s.admNo}</code></td>
     <td><span class="badge bc">${s.class}</span></td>
-    <td><button class="btn-del" onclick="delStudent('${s.id}')">Delete</button></td>
+    <td style="display:flex;gap:6px">
+  <button onclick="openEditStudent('${s.id}','${s.surname}','${s.firstName}','${s.admNo}','${s.class}')"
+    style="padding:4px 11px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;color:#1e40af;font-size:.78rem;font-weight:600;cursor:pointer">
+    Edit
+  </button>
+  <button class="btn-del" onclick="delStudent('${s.id}')">Delete</button>
+</td>
   </tr>
 `).join('');
   } catch { toast('⚠️ Could not load students.'); }
